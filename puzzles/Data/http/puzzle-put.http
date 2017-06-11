@@ -1,0 +1,157 @@
+PUT http://localhost:5000/api/puzzle HTTP/1.1
+content-type: application/json
+
+{
+  "id": 3,
+  "name": "Fruit",
+  "description": "Names of common fruits in the USA",
+  "puzzleWords": [
+    {
+      "id": 400,
+      "word": "apple"
+    },
+    {
+      "id": 401,
+      "word": "apricot"
+    },
+    {
+      "id": 402,
+      "word": "avocado"
+    },
+    {
+      "id": 403,
+      "word": "banana"
+    },
+    {
+      "id": 404,
+      "word": "blackberry"
+    },
+    {
+      "id": 405,
+      "word": "blueberry"
+    },
+    {
+      "id": 406,
+      "word": "boisenberry"
+    },
+    {
+      "id": 407,
+      "word": "cantaloupe"
+    },
+    {
+      "id": 408,
+      "word": "cherry"
+    },
+    {
+      "id": 409,
+      "word": "coconut"
+    },
+    {
+      "id": 410,
+      "word": "cranberry"
+    },
+    {
+      "id": 411,
+      "word": "date"
+    },
+    {
+      "id": 412,
+      "word": "fig"
+    },
+    {
+      "id": 413,
+      "word": "gooseberry"
+    },
+    {
+      "id": 414,
+      "word": "grapefruit"
+    },
+    {
+      "id": 415,
+      "word": "grapes"
+    },
+    {
+      "id": 416,
+      "word": "guava"
+    },
+    {
+      "id": 417,
+      "word": "kiwi"
+    },
+    {
+      "id": 418,
+      "word": "kumquat"
+    },
+    {
+      "id": 419,
+      "word": "lemon"
+    },
+    {
+      "id": 420,
+      "word": "lime"
+    },
+    {
+      "word": "loquat"
+    },
+    {
+      "id": 421,
+      "word": "mango"
+    },
+    {
+      "id": 422,
+      "word": "olive"
+    },
+    {
+      "id": 423,
+      "word": "orange"
+    },
+    {
+      "id": 424,
+      "word": "papaya"
+    },
+    {
+      "id": 425,
+      "word": "passionfruit"
+    },
+    {
+      "id": 426,
+      "word": "peach"
+    },
+    {
+      "id": 427,
+      "word": "pear"
+    },
+    {
+      "id": 428,
+      "word": "persimmon"
+    },
+    {
+      "id": 429,
+      "word": "pineapple"
+    },
+    {
+      "id": 430,
+      "word": "plum"
+    },
+    {
+      "id": 431,
+      "word": "pomegranate"
+    },
+    {
+      "id": 432,
+      "word": "raspberry"
+    },
+    {
+      "id": 433,
+      "word": "strawberry"
+    },
+    {
+      "id": 434,
+      "word": "tangerine"
+    },
+    {
+      "id": 435,
+      "word": "watermellon"
+    }
+  ]
+}

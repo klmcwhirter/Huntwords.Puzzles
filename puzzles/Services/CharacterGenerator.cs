@@ -1,0 +1,17 @@
+using System.Linq;
+using puzzles.Utils;
+
+namespace puzzles.Services
+{
+    public class CharacterGenerator : ICharacterGenerator
+    {
+        static readonly string[] UpperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c.ToString()).ToArray();
+
+        public string Generate(params object[] options)
+        {
+            var idx = UpperCaseLetters.Length.Random();
+            var rc = UpperCaseLetters[idx];
+            return rc;
+        }
+    }
+}

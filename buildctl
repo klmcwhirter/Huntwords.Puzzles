@@ -1,0 +1,129 @@
+#!/bin/bash
+#*------------------------------------------------------------------------------*
+#* Constants
+CMD=../$(basename $0)
+
+# Name of tye Docker Hub repository
+REPO=klmcwhirter
+
+# Name of the Docker image to build
+IMAGE=puzzle-service
+
+# Name of the executable
+EXE=puzzles
+
+# Name for the container to start
+CONTAINER=con${IMAGE}
+
+# Port # to map locally when starting the container
+PORT=5000
+
+# Command to use to scp to the Raspberry Pi 3 to which scp will copy
+RPI3SCP=klmcwpi3scp
+
+# Path on the Raspberry Pi 3 to which scp will copy
+RPI3PATH=/home/klmcw/src/github.com/klmcwhirter
+
+#*------------------------------------------------------------------------------*
+#* Variables
+
+arch=`echo $2 | sed 's/.*\(arm\).*/\1/'`
+if [ "${arch}" = "arm" ]
+then
+  arch=arm32v7
+else
+  arch=x86_64
+fi
+dockerfile="Dockerfile.${arch}"
+
+cmd=$1
+runtime=$2
+if [ ! -z "$runtime" ]
+then
+    runtimeopts="-r $2"
+fi
+
+#*------------------------------------------------------------------------------*
+function log
+{
+  timestamp=$(date "+%Y/%m/%d %H:%M:%S")
+  echo ">>> ${timestamp}: $*"
+}
+#*---------------------------------------------------------------------------*
+#* M A I N  P R O G R A M
+#*---------------------------------------------------------------------------*
+
+log "$0 $*"
+
+if [ $(basename "${PWD}") != "puzzles" ]
+then
+  cd puzzles
+fi
+
+case $cmd in
+'build')
+  ${CMD} clean $2
+  dotnet restore $runtimeopts
+  dotnet build $runtimeopts
+  ${CMD} build-db $2
+  ;;
+'build-db')
+  dotnet ef database update
+  ./Data/loadsql.sh Data/V1.1.0__add_animals.sql
+  ./Data/loadsql.sh Data/V1.1.1__add_flowers.sql
+  ./Data/loadsql.sh Data/V1.1.2__add_fruit.sql
+  ;;
+'clean')
+  rm -fr bin obj dist
+  ;;
+'publish')
+  ${CMD} build $2
+  dotnet publish --self-contained $runtimeopts
+  mkdir -p dist
+  ROOT=${PWD}
+  mv bin/Debug/netcoreapp2.0/$runtime/publish ${ROOT}/dist/${IMAGE}
+  cp bin/Debug/netcoreapp2.0/puzzles.sqlite ${ROOT}/dist/${IMAGE}
+  chmod +x ${ROOT}/dist/${IMAGE}/${EXE}
+  cd ../..
+  tar czf /tmp/${IMAGE}-${arch}.tgz ${IMAGE}
+  ;;
+'scp')
+  $RPI3SCP /tmp/${IMAGE}-${arch}.tgz $RPI3PATH
+  ;;
+'docker-build')
+  ${CMD} docker-rmi $2
+
+  log "BUILDING IMAGE ${REPO}/${IMAGE}:${arch}"
+  docker build --force-rm -f $dockerfile -t ${REPO}/${IMAGE}:${arch} .
+  ;;
+'docker-rmi')
+  ${CMD} stop $2
+
+  docker inspect ${REPO}/${IMAGE}:${arch} >/dev/null 2>&1
+  if [ $? -eq 0 ]
+  then
+    log "REMOVING IMAGE ${REPO}/${IMAGE}:${arch}"
+    docker rmi ${REPO}/${IMAGE}:${arch}
+  fi
+  ;;
+'docker-start')
+  log "STARTING ${CONTAINER} on port ${PORT}"
+  docker run -d --name ${CONTAINER} -p ${PORT}:5000 ${REPO}/${IMAGE}:${arch}
+  ;;
+'docker-stop')
+  docker inspect ${CONTAINER} >/dev/null 2>&1
+  if [ $? -eq 0 ]
+  then
+    log "STOPPING and REMOVING CONTAINER ${CONTAINER}"
+    docker stop ${CONTAINER}
+    docker rm -v ${CONTAINER}
+  fi
+  ;;
+'docker-push')
+  docker push ${REPO}/${IMAGE}:${arch}
+  ;;
+esac
+
+log "Done - $*."
+
+#*------------------------------------------------------------------------------*

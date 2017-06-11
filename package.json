@@ -1,0 +1,35 @@
+{
+  "name": "puzzles",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "clean": "./buildctl clean",
+
+    "build": "npm run publish && npm run docker-build",
+    "docker-build": "./buildctl docker-build debian.8-x64",
+    "publish": "./buildctl publish debian.8-x64",
+
+    "rmi": "./buildctl docker-rmi debian.8-x64",
+    "docker-start": "./buildctl docker-start debian.8-x64",
+    "docker-stop": "./buildctl docker-stop debian.8-x64",
+
+    "build-arm": "npm run publish-arm && npm run docker-build-arm",
+    "docker-build-arm": "./buildctl docker-build ubuntu.16.04-arm",
+    "publish-arm": "./buildctl publish ubuntu.16.04-arm",
+    "scp-arm": "./buildctl scp ubuntu.16.04-arm",
+    "rpi3": "npm run build-arm && npm run scp-arm",
+
+    "docker-push": "./buildctl docker-push debian.8-x64",
+    "docker-push-arm": "./buildctl docker-push ubuntu.16.04-arm",
+
+    "docker-rmi-arm": "./buildctl docker-rmi ubuntu.16.04-arm",
+    "docker-start-arm": "./buildctl docker-start ubuntu.16.04-arm",
+    "docker-stop-arm": "./buildctl docker-stop ubuntu.16.04-arm",
+
+    "test": "cd puzzles.Tests && dotnet restore && dotnet test",
+
+    "start-debug": "export ASPNETCORE_ENVIRONMENT=Development && export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -p puzzles/puzzles.csproj",
+    "start": "export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -c Release -p puzzles/puzzles.csproj"
+  },
+  "private": true
+}

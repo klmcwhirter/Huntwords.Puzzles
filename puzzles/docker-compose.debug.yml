@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+  puzzles:
+    image: puzzles:debug
+    build:
+      context: ./PublishOutput/
+      dockerfile: Dockerfile.debug
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_CLI_TELEMETRY_OPTOUT=1
+    volumes:
+      - ./PublishOutput/:/app
+      - ~/.dotnet:/root/.dotnet
+      - ~/.nuget:/root/.nuget

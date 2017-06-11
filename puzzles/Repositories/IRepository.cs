@@ -1,0 +1,19 @@
+using System.Linq;
+
+namespace puzzles.Repositories
+{
+    public interface IRepository<TKey, TEntity>
+    {
+        TEntity Get(TKey id);
+
+        IQueryable<TEntity> GetAll();
+
+        void Add(TEntity entity);
+
+        void Update(TKey id, TEntity entity);
+
+        void Delete(TKey id);
+
+        void SaveChanges();
+    }
+}

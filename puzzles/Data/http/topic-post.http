@@ -1,0 +1,7 @@
+POST http://localhost:5000/api/topic HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Animal Kingdom",
+    "description": "Throughout the animal kingdom are great mysteries - explore them here."
+}

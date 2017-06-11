@@ -1,0 +1,45 @@
+POST http://localhost:5000/api/puzzle HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Common Fruits",
+    "description": "Names of common fruits in the USA",
+    "puzzleWords": [
+        { "word": "apple" },
+        { "word": "apricot" },
+        { "word": "avocado" },
+        { "word": "banana" },
+        { "word": "blackberry" },
+        { "word": "blueberry" },
+        { "word": "boisenberry" },
+        { "word": "cantaloupe" },
+        { "word": "cherry" },
+        { "word": "coconut" },
+        { "word": "cranberry" },
+        { "word": "date" },
+        { "word": "fig" },
+        { "word": "gooseberry" },
+        { "word": "grapefruit" },
+        { "word": "grapes" },
+        { "word": "guava" },
+        { "word": "kiwi" },
+        { "word": "kumquat" },
+        { "word": "lemon" },
+        { "word": "lime" },
+        { "word": "mango" },
+        { "word": "olive" },
+        { "word": "orange" },
+        { "word": "papaya" },
+        { "word": "passionfruit" },
+        { "word": "peach" },
+        { "word": "pear" },
+        { "word": "persimmon" },
+        { "word": "pineapple" },
+        { "word": "plum" },
+        { "word": "pomegranate" },
+        { "word": "raspberry" },
+        { "word": "strawberry" },
+        { "word": "tangerine" },
+        { "word": "watermellon" }
+    ]
+}

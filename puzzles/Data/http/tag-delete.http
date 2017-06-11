@@ -1,0 +1,1 @@
+DELETE http://localhost:5000/api/tag/2 HTTP/1.1

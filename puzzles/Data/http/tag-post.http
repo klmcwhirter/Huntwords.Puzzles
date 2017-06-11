@@ -1,0 +1,7 @@
+POST http://localhost:5000/api/tag HTTP/1.1
+content-type: application/json
+
+{
+    "name": "mammal",
+    "description": "Mammalian animals"
+}
