@@ -28,8 +28,7 @@
 
     "test": "cd puzzles.Tests && dotnet restore && dotnet test",
 
-    "start-debug": "export ASPNETCORE_ENVIRONMENT=Development && export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -p puzzles/puzzles.csproj",
-    "start": "export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -c Release -p puzzles/puzzles.csproj"
+    "start": "export ASPNETCORE_ENVIRONMENT=Development && export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -p puzzles/puzzles.csproj"
   },
   "private": true
 }
