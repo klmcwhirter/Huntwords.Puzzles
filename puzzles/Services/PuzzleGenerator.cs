@@ -8,7 +8,7 @@ namespace puzzles.Services
 {
     public class PuzzleGenerator : IGenerator<Puzzle>
     {
-        public IPuzzleKind[] Kinds => Options.Kinds.Select(k => SelectWordGenerator(k)).ToArray();
+        public IPuzzleKind[] Kinds => Options.Kinds.Select(k => SelectWordGenerator(k, 1)).ToArray();
 
         protected IGenerator<PuzzleBoard> BoardGenerator { get; }
 
@@ -37,7 +37,7 @@ namespace puzzles.Services
             var words = new List<PuzzleWord>();
             var displayedWords = new List<string>();
             var letterCount = (int)(maxWidth * maxHeight * wordDensity);
-            var wordGenerator = SelectWordGenerator(mode);
+            var wordGenerator = SelectWordGenerator(mode, id);
 
             do
             {
@@ -70,12 +70,16 @@ namespace puzzles.Services
             return rc;
         }
 
-        protected IPuzzleKind SelectWordGenerator(string mode)
+        protected IPuzzleKind SelectWordGenerator(string mode, int? id)
         {
             IPuzzleKind rc;
             if (!WordGenerators.TryGetValue(mode, out rc))
             {
-                rc = WordGenerators[WordWordGenerator.StaticKey];
+                var localrc = WordGenerators[WordWordGenerator.StaticKey];
+                if(localrc.IsIdValid(id))
+                {
+                    rc = localrc;
+                }
             }
             return rc;
         }

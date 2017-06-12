@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Logging;
 using puzzles.Models;
 using puzzles.Repositories;
 using puzzles.Utils;
@@ -23,6 +25,26 @@ namespace puzzles.Services
 
         [DataMember]
         public string Description => Puzzle?.Description ?? "Pick from a set of saved puzzles";
+        
+        private ILogger<DbPuzzleWordGenerator> Logger { get; }
+
+        public bool IsIdValid(int? id)
+        {
+            var rc = false;
+            try
+            {
+                if (id.HasValue)
+                {
+                    Puzzle = Repository.Get(id.Value);
+                    rc = true;
+                }
+            }
+            catch(Exception e)
+            {
+                Logger.LogError(e, string.Empty);
+            }
+            return rc;
+        }
 
         static readonly PuzzleKindFeatures DbPuzzleFeatures = new PuzzleKindFeatures
         {
@@ -37,9 +59,10 @@ namespace puzzles.Services
 
         public IPuzzlesRepository Repository { get; }
 
-        public DbPuzzleWordGenerator(IPuzzlesRepository repository)
+        public DbPuzzleWordGenerator(IPuzzlesRepository repository, ILogger<DbPuzzleWordGenerator> logger)
         {
             Repository = repository;
+            Logger = logger;
         }
 
         protected int CurrentIdx { get; set; } = 0;

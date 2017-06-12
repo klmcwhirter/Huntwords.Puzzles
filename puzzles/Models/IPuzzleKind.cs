@@ -8,6 +8,8 @@ namespace puzzles.Models
         string Name { get; }
         string Description { get; }
 
+        bool IsIdValid(int? id);
+
         PuzzleKindFeatures Features { get; }
     }
 }

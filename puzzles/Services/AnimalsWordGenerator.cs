@@ -20,6 +20,8 @@ namespace puzzles.Services
         [DataMember]
         public string Description { get; set; } = "Puzzle containing a randomly selected list of animals.";
 
+        public bool IsIdValid(int? id) => true;
+
         static readonly PuzzleKindFeatures AnimalsPuzzleFeatures = new PuzzleKindFeatures
         {
             HasTopics = false,
