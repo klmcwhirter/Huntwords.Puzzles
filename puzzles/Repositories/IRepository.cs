@@ -8,9 +8,9 @@ namespace puzzles.Repositories
 
         IQueryable<TEntity> GetAll();
 
-        void Add(TEntity entity);
+        TEntity Add(TEntity entity);
 
-        void Update(TKey id, TEntity entity);
+        TEntity Update(TKey id, TEntity entity);
 
         void Delete(TKey id);
 

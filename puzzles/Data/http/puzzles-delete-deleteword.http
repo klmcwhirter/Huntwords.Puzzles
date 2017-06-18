@@ -1,0 +1,1 @@
+DELETE http://localhost:5000/api/puzzles/3/deleteWord/158 HTTP/1.1

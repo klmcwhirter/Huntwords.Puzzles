@@ -49,9 +49,9 @@ namespace puzzles.Repositories
 
         public IQueryable<string> GetAll() => Words.AsQueryable();
 
-        public void Add(string word) => throw new NotImplementedException();
+        public string Add(string word) => throw new NotImplementedException();
 
-        public void Update(int id, string word) => throw new NotImplementedException();
+        public string Update(int id, string word) => throw new NotImplementedException();
 
         public void Delete(int id) => throw new NotImplementedException();
 

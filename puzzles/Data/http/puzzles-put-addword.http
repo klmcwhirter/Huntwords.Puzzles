@@ -1,0 +1,6 @@
+PUT http://localhost:5000/api/puzzles/3/addWord HTTP/1.1
+content-type: application/json
+
+{
+  "word": "someword"
+}

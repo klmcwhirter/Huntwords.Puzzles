@@ -53,26 +53,47 @@ namespace puzzles.Controllers
 
         // POST api/puzzle
         [HttpPost]
-        public void Post([FromBody]Puzzle puzzle)
+        public Puzzle Post([FromBody]Puzzle puzzle)
         {
-            PuzzleRepository.Add(puzzle);
+            var rc = PuzzleRepository.Add(puzzle);
             PuzzleRepository.SaveChanges();
+            return rc;
         }
 
         // PUT api/puzzle
         [HttpPut]
-        public void Put([FromBody]Puzzle puzzle)
+        public Puzzle Put([FromBody]Puzzle puzzle)
         {
-            PuzzleRepository.Update(puzzle.Id, puzzle);
+            var rc = PuzzleRepository.Update(puzzle.Id, puzzle);
             PuzzleRepository.SaveChanges();
+            return rc;
+        }
+
+        // PUT api/puzzles/{id}/addWord
+        [HttpPut("{id}/addWord")]
+        public Puzzle AddWord(int id, [FromBody]PuzzleWord word)
+        {
+            var rc = PuzzleRepository.AddWord(id, word.Word);
+            PuzzleRepository.SaveChanges();
+            return rc;
+        }
+
+        // DELETE api/puzzles/{id}/deleteWord/{wordId}
+        [HttpDelete("{id}/deleteWord/{wordId}")]
+        public Puzzle DeleteWord(int id, int wordId)
+        {
+            var rc = PuzzleRepository.DeleteWord(id, wordId);
+            PuzzleRepository.SaveChanges();
+            return rc;
         }
 
         // DELETE api/puzzle/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IEnumerable<Puzzle> Delete(int id)
         {
             PuzzleRepository.Delete(id);
             PuzzleRepository.SaveChanges();
+            return PuzzleRepository.GetAll();
         }
 
 

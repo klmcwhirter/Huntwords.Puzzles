@@ -1,4 +1,4 @@
-POST http://localhost:5000/api/topic HTTP/1.1
+POST http://localhost:5000/api/topics HTTP/1.1
 content-type: application/json
 
 {

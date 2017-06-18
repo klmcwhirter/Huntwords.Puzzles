@@ -26,7 +26,7 @@ namespace puzzles.Models
         public string Tags { get; set; }
 
         [DataMember]
-        public IEnumerable<PuzzleWord> PuzzleWords { get; set; }
+        public ICollection<PuzzleWord> PuzzleWords { get; set; }
 
         [NotMapped]
         [DataMember]

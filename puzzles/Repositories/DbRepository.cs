@@ -16,9 +16,10 @@ namespace puzzles.Repositories
             DbContext = context;
         }
 
-        public virtual void Add(T entity)
+        public virtual T Add(T entity)
         {
             DbSet.Add(entity);
+            return entity;
         }
 
         public virtual void Delete(K id)
@@ -38,10 +39,11 @@ namespace puzzles.Repositories
             return DbSet;
         }
 
-        public virtual void Update(K id, T entity)
+        public virtual T Update(K id, T entity)
         {
             var entityEntry = DbSet.Attach(entity);
             entityEntry.State = EntityState.Modified;
+            return entity;
         }
 
         public void SaveChanges()
