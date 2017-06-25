@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using puzzles.Models;
 using puzzles.Repositories;
@@ -34,26 +35,32 @@ namespace puzzles.Controllers
 
         // POST api/tag/
         [HttpPost]
-        public void Post([FromBody]Tag tag)
+        public Tag[] Post([FromBody]Tag tag)
         {
             TagsRepository.Add(tag);
             TagsRepository.SaveChanges();
+            var rc = TagsRepository.GetAll();
+            return rc.ToArray();
         }
 
         // PUT api/tag/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]Tag tag)
+        public IEnumerable<Tag> Put(int id, [FromBody]Tag tag)
         {
             TagsRepository.Update(id, tag);
             TagsRepository.SaveChanges();
+            var rc = TagsRepository.GetAll();
+            return rc.ToArray();
         }
 
         // DELETE api/tag/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IEnumerable<Tag> Delete(int id)
         {
             TagsRepository.Delete(id);
             TagsRepository.SaveChanges();
+            var rc = TagsRepository.GetAll();
+            return rc.ToArray();
         }
     }
 }

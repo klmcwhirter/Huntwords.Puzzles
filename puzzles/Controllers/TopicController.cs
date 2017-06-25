@@ -34,26 +34,32 @@ namespace puzzles.Controllers
 
         // POST api/topic
         [HttpPost]
-        public void Post([FromBody]Topic topic)
+        public IEnumerable<Topic> Post([FromBody]Topic topic)
         {
             TopicRepository.Add(topic);
             TopicRepository.SaveChanges();
+            var rc = TopicRepository.GetAll();
+            return rc;
         }
 
         // PUT api/topic/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]Topic topic)
+        public IEnumerable<Topic>  Put(int id, [FromBody]Topic topic)
         {
             TopicRepository.Update(id, topic);
             TopicRepository.SaveChanges();
+            var rc = TopicRepository.GetAll();
+            return rc;
         }
 
         // DELETE api/topic/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IEnumerable<Topic>  Delete(int id)
         {
             TopicRepository.Delete(id);
             TopicRepository.SaveChanges();
+            var rc = TopicRepository.GetAll();
+            return rc;
         }
     }
 }

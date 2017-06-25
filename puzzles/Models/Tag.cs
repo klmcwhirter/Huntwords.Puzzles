@@ -7,6 +7,7 @@ namespace puzzles.Models
     public class Tag
     {
         [Key]
+        [DataMember]
         public int Id { get; set; }
 
         [DataMember]
