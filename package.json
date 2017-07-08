@@ -14,17 +14,17 @@
     "docker-stop": "./buildctl docker-stop debian.8-x64",
 
     "build-arm": "npm run publish-arm && npm run docker-build-arm",
-    "docker-build-arm": "./buildctl docker-build ubuntu.16.04-arm",
-    "publish-arm": "./buildctl publish ubuntu.16.04-arm",
-    "scp-arm": "./buildctl scp ubuntu.16.04-arm",
+    "docker-build-arm": "./buildctl docker-build linux-arm",
+    "publish-arm": "./buildctl publish linux-arm",
+    "scp-arm": "./buildctl scp linux-arm",
     "rpi3": "npm run build-arm && npm run scp-arm",
 
     "docker-push": "./buildctl docker-push debian.8-x64",
-    "docker-push-arm": "./buildctl docker-push ubuntu.16.04-arm",
+    "docker-push-arm": "./buildctl docker-push linux-arm",
 
-    "docker-rmi-arm": "./buildctl docker-rmi ubuntu.16.04-arm",
-    "docker-start-arm": "./buildctl docker-start ubuntu.16.04-arm",
-    "docker-stop-arm": "./buildctl docker-stop ubuntu.16.04-arm",
+    "docker-rmi-arm": "./buildctl docker-rmi linux-arm",
+    "docker-start-arm": "./buildctl docker-start linux-arm",
+    "docker-stop-arm": "./buildctl docker-stop linux-arm",
 
     "test": "cd puzzles.Tests && dotnet restore && dotnet test",
 

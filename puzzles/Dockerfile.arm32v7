@@ -1,5 +1,10 @@
 FROM klmcwhirter/arm32v7dotnetbase:xenial
-RUN apt-get update && apt-get install -y unzip wamerican-insane sqlite3
+
+ENV LD_LIBRARY_PATH /usr/lib/arm-linux-gnueabihf/
+
 WORKDIR /app
 COPY dist/puzzle-service /app
+
+RUN apt-get update && apt-get install -y libsqlite3-dev binutils unzip wamerican-insane sqlite3
+
 ENTRYPOINT ["/app/puzzles"]
