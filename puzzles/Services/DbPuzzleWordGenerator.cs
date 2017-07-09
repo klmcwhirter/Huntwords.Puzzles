@@ -12,8 +12,6 @@ namespace puzzles.Services
     [DataContract]
     public class DbPuzzleWordGenerator : IPuzzleKind
     {
-        public int? PuzzleId => Puzzle?.Id;
-
         [DataMember]
         public string Key => StaticKey;
 
@@ -27,24 +25,6 @@ namespace puzzles.Services
         public string Description => Puzzle?.Description ?? "Pick from a set of saved puzzles";
         
         private ILogger<DbPuzzleWordGenerator> Logger { get; }
-
-        public bool IsIdValid(int? id)
-        {
-            var rc = false;
-            try
-            {
-                if (id.HasValue)
-                {
-                    Puzzle = Repository.Get(id.Value);
-                    rc = true;
-                }
-            }
-            catch(Exception e)
-            {
-                Logger.LogError(e, string.Empty);
-            }
-            return rc;
-        }
 
         static readonly PuzzleKindFeatures DbPuzzleFeatures = new PuzzleKindFeatures
         {
@@ -70,22 +50,7 @@ namespace puzzles.Services
 
         public PuzzleWord Generate(params object[] options)
         {
-            // If we have not done so yet - retrieve the puzzle
-            if (options != null && options.Length > 0)
-            {
-                var id = (int)(options[0] ?? 3);
-                if (Puzzle == null || Puzzle.Id != id)
-                {
-                    Puzzle = Repository.Get(id);
-
-                    // If Puzzle changes - make sure to reinitialize Seen
-                    ResetSeen();
-                }
-            }
-            else
-            {
-                return null;
-            }
+            Puzzle = (Puzzle)options[0];
 
             PuzzleWord rc;
             string word;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using puzzles.Models;
 
@@ -6,18 +7,20 @@ namespace puzzles.Services
     [DataContract]
     public class WordWordGenerator : IPuzzleKind
     {
-        public static readonly string StaticKey = "word";
+        public const string StaticKey = "word";
 
         [DataMember]
         public string Key { get; } = StaticKey;
 
-        [DataMember]
-        public string Name { get; } = "Word";
+        public const string StaticName = "Word";
 
         [DataMember]
-        public string Description { get; set; } = "Puzzle containing a list of the word WORD";
+        public string Name { get; } = StaticName;
 
-        public bool IsIdValid(int? id) => true;
+        public const string StaticDescription = "Puzzle containing a list of the word WORD";
+    
+        [DataMember]
+        public string Description { get; set; } = StaticDescription;
 
         static readonly PuzzleKindFeatures WordPuzzleFeatures = new PuzzleKindFeatures
         {
@@ -29,8 +32,19 @@ namespace puzzles.Services
         [DataMember]
         public PuzzleKindFeatures Features => WordPuzzleFeatures;
 
-        public int? PuzzleId { get; } = null;
+        public Puzzle Puzzle { get; }
 
+        public WordWordGenerator()
+        {
+            Puzzle = new Puzzle
+            {
+                Id = -2,
+                Name = StaticName,
+                Description = StaticDescription,
+                PuzzleWords = new List<PuzzleWord>(),
+                Kind = this
+            };
+        }
         public PuzzleWord Generate(params object[] options)
         {
             var rc = new PuzzleWord
@@ -38,6 +52,9 @@ namespace puzzles.Services
                 Id = -1,
                 Word = "word"
             };
+
+            Puzzle.PuzzleWords.Add(rc);
+
             return rc;
         }
     }

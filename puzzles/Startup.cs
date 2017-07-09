@@ -12,6 +12,7 @@ using puzzles.Services;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace puzzles
 {
@@ -39,7 +40,6 @@ namespace puzzles
             services.AddOptions();
             // Register the IConfiguration instance which the Options classes bind against.
             services.Configure<PuzzleBoardGeneratorOptions>(options => Configuration.GetSection("Board").Bind(options));
-            services.Configure<PuzzleGeneratorOptions>(options => Configuration.GetSection("Puzzle").Bind(options));
             services.Configure<WordsRepositoryOptions>(options => Configuration.GetSection("Word").Bind(options));
 
             // Add framework services.
@@ -57,6 +57,7 @@ namespace puzzles
             // Add application repositories.
             builder.RegisterType<PuzzlesDbContext>().AsSelf();
 
+            builder.RegisterType<DbPuzzlesRepository>().AsSelf();
             builder.RegisterType<PuzzlesRepository>().As<IPuzzlesRepository>();
             builder.RegisterType<TagsRepository>().As<ITagsRepository>();
             builder.RegisterType<TopicsRepository>().As<ITopicsRepository>();
@@ -66,13 +67,11 @@ namespace puzzles
             // Add application services.
             builder.RegisterType<CharacterGenerator>().As<ICharacterGenerator>();
 
-            builder.RegisterType<PuzzleGenerator>().As<IGenerator<Puzzle>>();
             builder.RegisterType<PuzzleBoardGenerator>().As<IGenerator<PuzzleBoard>>();
-            builder.RegisterType<PuzzleBoardGenerator>();
+            builder.RegisterType<PuzzleWordGenerator>().As<IGenerator<IList<PuzzleWord>>>();
 
             // Word Generators
             builder.RegisterType<WordWordGenerator>().Keyed<IPuzzleKind>(WordWordGenerator.StaticKey);
-            // builder.RegisterType<AnimalsWordGenerator>().Keyed<IPuzzleKind>(AnimalsWordGenerator.StaticKey);
             builder.RegisterType<DbPuzzleWordGenerator>().Keyed<IPuzzleKind>(DbPuzzleWordGenerator.StaticKey);
             builder.RegisterType<RandomWordGenerator>().Keyed<IPuzzleKind>(RandomWordGenerator.StaticKey);
 

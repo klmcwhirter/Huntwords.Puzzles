@@ -113,6 +113,10 @@ case $cmd in
     docker rmi ${REPO}/${IMAGE}:${arch}
   fi
   ;;
+'docker-push')
+  log docker push klmcwhirter/${IMAGE}:${arch}
+  docker push klmcwhirter/${IMAGE}:${arch}
+  ;;
 'docker-start')
   log "STARTING ${CONTAINER} on port ${PORT}"
   docker run -d --name ${CONTAINER} -p ${PORT}:5000 ${REPO}/${IMAGE}:${arch}

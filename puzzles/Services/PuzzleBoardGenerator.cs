@@ -26,51 +26,55 @@ namespace puzzles.Services
         public int MaxTries { get; set; }
         public int MinDiagonals { get; set; }
         ICharacterGenerator CharacterGenerator { get; }
+        IGenerator<IList<PuzzleWord>> PuzzleWordGenerator { get; }
         public PuzzleBoardGeneratorOptions Options { get; set; }
         ILogger<PuzzleBoardGenerator> Logger { get; }
 
         public PuzzleBoardGenerator(
           ICharacterGenerator characterGenerator,
+          IGenerator<IList<PuzzleWord>> puzzleWordGenerator,
           IOptions<PuzzleBoardGeneratorOptions> options,
           ILogger<PuzzleBoardGenerator> logger)
         {
             CharacterGenerator = characterGenerator;
+            PuzzleWordGenerator = puzzleWordGenerator;
             Options = options.Value;
             Logger = logger;
         }
 
         public PuzzleBoard Generate(params object[] options)
         {
-            var width = (int)options[0];
-            var height = (int)options[1];
-            var words = (string[])options[2];
+            var puzzle = (Puzzle)options[0];
 
             // Some algorithms try to do fancy things like sort the word list in reverse length order
             // This generates placements that rarely include diagonal directions. Just say no!
 
             var rc = new PuzzleBoard
             {
-                Width = width,
-                Height = height
+                Width = Options.MaxWidth,
+                Height = Options.MaxHeight,
+                Puzzle = puzzle
             };
+
+            var words = PuzzleWordGenerator.Generate(puzzle, Options);
 
             // No sense in trying more cells than exist in the grid
             // factor is used to account for potential duplication in the random number generator
-            MaxTries = Directions.Length * width * height * Options.RandomFactor;
+            MaxTries = Directions.Length * rc.Width * rc.Height * Options.RandomFactor;
 
             // Round down
-            MinDiagonals = (int)Math.Ceiling(words.Length * Options.DiagonalRatio);
+            MinDiagonals = (int)Math.Ceiling(words.Count * Options.DiagonalRatio);
 
             var retry = 1;
             for (; retry <= Options.Retries; retry++)
             {
-                rc.Letters = new string[height, width];
-                rc.Solutions = new WordSolution[words.Length];
+                rc.Letters = new string[rc.Height, rc.Width];
+                rc.Solutions = new WordSolution[words.Count];
 
-                for (var w = 0; w < words.Length; w++)
+                for (var w = 0; w < words.Count; w++)
                 {
                     var word = words[w];
-                    rc.Solutions[w] = PlaceWord(rc, word);
+                    rc.Solutions[w] = PlaceWord(rc, word.Word);
                 }
 
                 if (!ValidSolution(retry, rc.Solutions))

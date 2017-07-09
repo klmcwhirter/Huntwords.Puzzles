@@ -34,9 +34,5 @@ namespace puzzles.Models
 
         [NotMapped]
         public string[] Words => PuzzleWords.Select(pw => pw.Word).ToArray();
-
-        [NotMapped]
-        [DataMember]
-        public PuzzleBoard Board { get; set; }
     }
 }

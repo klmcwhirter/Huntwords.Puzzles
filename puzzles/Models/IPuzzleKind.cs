@@ -1,14 +1,11 @@
 
 namespace puzzles.Models
 {
-    public interface IPuzzleKind : IGenerator<PuzzleWord>
+    public interface IPuzzleKind : IGenerator<PuzzleWord>, IPuzzleProvider
     {
-        int? PuzzleId { get; }
         string Key { get; }
         string Name { get; }
         string Description { get; }
-
-        bool IsIdValid(int? id);
 
         PuzzleKindFeatures Features { get; }
     }

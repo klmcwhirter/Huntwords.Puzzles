@@ -13,13 +13,11 @@ namespace puzzles.Controllers
     public class PuzzlesController : Controller
     {
         protected IPuzzlesRepository PuzzleRepository { get; set; }
-        protected IGenerator<Puzzle> PuzzleGenerator { get; set; }
         public ILogger<PuzzlesController> Logger { get; }
 
-        public PuzzlesController(IPuzzlesRepository puzzleRepository, IGenerator<Puzzle> puzzleGenerator, ILogger<PuzzlesController> logger)
+        public PuzzlesController(IPuzzlesRepository puzzleRepository, ILogger<PuzzlesController> logger)
         {
             PuzzleRepository = puzzleRepository;
-            PuzzleGenerator = puzzleGenerator;
             Logger = logger;
         }
 
@@ -94,23 +92,6 @@ namespace puzzles.Controllers
             PuzzleRepository.Delete(id);
             PuzzleRepository.SaveChanges();
             return PuzzleRepository.GetAll();
-        }
-
-
-        // GET api/puzzle/kind/:kind
-        [HttpGet("kind/{kind}/{id?}")]
-        public Puzzle GetKind(string kind, int? id)
-        {
-            var rc = PuzzleGenerator.Generate(kind, id);
-            return rc;
-        }
-
-        // GET api/puzzle/kinds
-        [HttpGet("kinds")]
-        public IPuzzleKind[] GetKinds()
-        {
-            var rc = (PuzzleGenerator as PuzzleGenerator)?.Kinds;
-            return rc;
         }
     }
 }

@@ -16,5 +16,8 @@ namespace puzzles.Models
 
         [DataMember]
         public WordSolution[] Solutions { get; set; }
+
+        [DataMember]
+        public Puzzle Puzzle { get; set; }
     }
 }

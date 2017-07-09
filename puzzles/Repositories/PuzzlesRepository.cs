@@ -1,69 +1,68 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Autofac.Features.Indexed;
 using puzzles.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using puzzles.Services;
 
 namespace puzzles.Repositories
 {
-    public class PuzzlesRepository : DbRepository<int, Puzzle>, IPuzzlesRepository
+    public class PuzzlesRepository : IPuzzlesRepository
     {
-        protected override DbSet<Puzzle> DbSet => DbContext.Puzzles;
-        public ILogger<PuzzlesRepository> Logger { get; }
+        protected IIndex<string, IPuzzleKind> PuzzleKinds { get; }
+        protected DbPuzzlesRepository Repository { get; }
 
-        public PuzzlesRepository(PuzzlesDbContext context, ILogger<PuzzlesRepository> logger) : base(context)
+        public PuzzlesRepository(
+            IIndex<string, IPuzzleKind> puzzleKinds,
+            DbPuzzlesRepository dbPuzzleRepository)
         {
-            Logger = logger;
+            PuzzleKinds = puzzleKinds;
+            Repository = dbPuzzleRepository;
         }
 
-        public override IQueryable<Puzzle> GetAll()
-        {
-            var rc = DbSet
-                        .Include(p => p.PuzzleWords);
-            return rc;
-        }
 
-        public override Puzzle Get(int id)
+        public Puzzle Add(Puzzle entity)
         {
-            Logger.LogInformation($"PuzzleRepository.Get({id})");
-            var rc = GetAll()
-                        .Where(p => p.Id == id)
-                        .FirstOrDefault();
-            Logger.LogInformation($"PuzzleRepository.Get({id}): PuzzleWords.Count={rc.PuzzleWords.Count}");
-            return rc;
+            throw new NotImplementedException();
         }
 
         public Puzzle AddWord(int id, string word)
         {
-            var puzzle = Get(id);
-            if (!puzzle.PuzzleWords.Any(w => w.Word == word))
-            {
-                puzzle.PuzzleWords.Add(new PuzzleWord { Word = word });
-            }
-            return puzzle;
+            throw new NotImplementedException();
         }
 
         public void Delete(int id)
         {
-            Logger.LogInformation($"PuzzleRepository.Delete({id})");
-            var entity = Get(id);
-            foreach (var word in entity.PuzzleWords.ToArray())
-            {
-                entity.PuzzleWords.Remove(word);
-                DbContext.PuzzleWords.Remove(word);
-            }
-            Logger.LogInformation($"PuzzleRepository.Delete({id}): PuzzleWords.Count={entity.PuzzleWords.Count}");
-            
-            DbSet.Remove(entity);
+            throw new NotImplementedException();
         }
 
         public Puzzle DeleteWord(int id, int wordId)
         {
-            var puzzle = Get(id);
-            foreach(var puzzleWord in puzzle.PuzzleWords.Where(w => w.Id == wordId).ToArray())
-            {
-                puzzle.PuzzleWords.Remove(puzzleWord);
-            }
-            return puzzle;
+            throw new NotImplementedException();
+        }
+
+        public Puzzle Get(int id)
+        {
+            return GetAll().Where(p => p.Id == id).FirstOrDefault();
+        }
+
+        public IQueryable<Puzzle> GetAll()
+        {
+            var inMemoryPuzzleKinds = new[] { PuzzleKinds[RandomWordGenerator.StaticKey], PuzzleKinds[WordWordGenerator.StaticKey] };
+            var rc = new List<Puzzle>(inMemoryPuzzleKinds.Where(k => !k.Features.HasSavedPuzzles).Select(k => k.Puzzle));
+            var dbQ = Repository.GetAll();
+            rc.AddRange(dbQ);
+            return rc.AsQueryable();
+        }
+
+        public void SaveChanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Puzzle Update(int id, Puzzle entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }
