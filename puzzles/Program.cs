@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace puzzles
 {
@@ -11,17 +12,18 @@ namespace puzzles
     {
         public static void Main(string[] args)
         {
-            var config = new ConfigurationBuilder()
-                .AddCommandLine(args)
-                .AddEnvironmentVariables(prefix: "ASPNETCORE_")
-                .Build();
-
-            var hostBuilder = new WebHostBuilder()
-                .UseConfiguration(config)
+            var host = new WebHostBuilder()
+                .UseSetting(WebHostDefaults.PreventHostingStartupKey, "true")
+                .ConfigureLogging((context, factory) =>
+                {
+                    factory.AddConfiguration(context.Configuration.GetSection("Logging"));
+                    factory.AddConsole();
+                    factory.AddDebug();
+                })
                 .UseKestrel()
-                .UseUrls("http://*:5000/");
-
-            var host = hostBuilder
+                .UseUrls("http://*:5000/")
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
 
