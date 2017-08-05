@@ -23,11 +23,11 @@ namespace puzzles.Services
         };
 
         static WordSlope[] Directions => DirectionOffsets.Keys.ToArray();
-        public int MaxTries { get; set; }
-        public int MinDiagonals { get; set; }
+        int MaxTries { get; set; }
+        int MinDiagonals { get; set; }
         ICharacterGenerator CharacterGenerator { get; }
         IGenerator<IList<PuzzleWord>> PuzzleWordGenerator { get; }
-        public PuzzleBoardGeneratorOptions Options { get; set; }
+        PuzzleBoardGeneratorOptions Options { get; set; }
         ILogger<PuzzleBoardGenerator> Logger { get; }
 
         public PuzzleBoardGenerator(
@@ -45,6 +45,7 @@ namespace puzzles.Services
         public PuzzleBoard Generate(params object[] options)
         {
             var puzzle = (Puzzle)options[0];
+            var verbose = (bool)options[1];
 
             // Some algorithms try to do fancy things like sort the word list in reverse length order
             // This generates placements that rarely include diagonal directions. Just say no!
@@ -74,15 +75,15 @@ namespace puzzles.Services
                 for (var w = 0; w < words.Count; w++)
                 {
                     var word = words[w];
-                    rc.Solutions[w] = PlaceWord(rc, word.Word);
+                    rc.Solutions[w] = PlaceWord(rc, word.Word, verbose);
                 }
 
-                if (!ValidSolution(retry, rc.Solutions))
+                if (!ValidSolution(retry, rc, verbose))
                 {
                     continue;
                 }
 
-                Logger.LogInformation($"Found a solution after {retry} tries");
+                if(verbose) Logger.LogInformation($"Found a solution for puzzle={rc.Puzzle.Id} after {retry} tries");
                 break; // phew found a solution
             }
 
@@ -91,9 +92,9 @@ namespace puzzles.Services
             return rc;
         }
 
-        private WordSolution PlaceWord(PuzzleBoard board, string word)
+        private WordSolution PlaceWord(PuzzleBoard board, string word, bool verbose)
         {
-            Logger.LogDebug($"Placing word={word}");
+            if(verbose) Logger.LogDebug($"Placing word={word}");
 
             var rc = new WordSolution
             {
@@ -129,7 +130,7 @@ namespace puzzles.Services
                         {
                             WordCopyToBoard(word, board, dirOffsets, x, y);
 
-                            Logger.LogDebug($"{word} was placed @ ({x},{y}) via {wordSlope} in {tries} tries");
+                            if(verbose) Logger.LogDebug($"{word} was placed @ ({x},{y}) via {wordSlope} for puzzle={board.Puzzle.Id} in {tries} tries");
 
                             rc.Placed = true;
                             rc.WordSlope = wordSlope;
@@ -141,7 +142,7 @@ namespace puzzles.Services
                 }
             }
 
-            Logger.LogDebug($"{word} was not placed in {tries} tries");
+            if(verbose) Logger.LogDebug($"{word} was not placed in {tries} tries");
 
             return rc;
         }
@@ -161,12 +162,14 @@ namespace puzzles.Services
         }
 
         /// Validate the quality of the solution
-        private bool ValidSolution(int retry, WordSolution[] solutions)
+        private bool ValidSolution(int retry, PuzzleBoard board, bool verbose)
         {
+            var solutions = board.Solutions;
+
             // If any words were not placed - try again
             if (solutions.Any(s => !s.Placed))
             {
-                Logger.LogError($">>>> At least 1 word was not placed - retrying for try {retry+1}");
+                if(verbose) Logger.LogError($">>>> At least 1 word was not placed for puzzle={board.Puzzle.Id} - retrying for try {retry+1}");
                 return false;
             }
 
@@ -174,7 +177,7 @@ namespace puzzles.Services
             var numDiags = solutions.CountDirection(new[] { WordSlope.NW, WordSlope.NW, WordSlope.SW, WordSlope.SE });
             if (numDiags < MinDiagonals)
             {
-                Logger.LogError($">>>> There were not enough diagonal placements - wanting at least {MinDiagonals} but got {numDiags} - retrying for try {retry+1}");
+                if(verbose) Logger.LogError($">>>> There were not enough diagonal placements for puzzle={board.Puzzle.Id} - wanting at least {MinDiagonals} but got {numDiags} - retrying for try {retry+1}");
                 return false;
             }
 
@@ -182,7 +185,7 @@ namespace puzzles.Services
             var numVerts = solutions.CountDirection(new[] { WordSlope.N, WordSlope.S });
             if (numVerts < 1)
             {
-                Logger.LogError($">>>> There were no vertical placements - retrying for try {retry+1}");
+                if(verbose) Logger.LogError($">>>> There were no vertical placements for puzzle={board.Puzzle.Id} - retrying for try {retry+1}");
                 return false;
             }
 
@@ -190,7 +193,7 @@ namespace puzzles.Services
             var numHoriz = solutions.CountDirection(new[] { WordSlope.W, WordSlope.E });
             if (numHoriz < 1)
             {
-                Logger.LogError($">>>> There were no horizontal placements - retrying for try {retry+1}");
+                if(verbose) Logger.LogError($">>>> There were no horizontal placements for puzzle={board.Puzzle.Id} - retrying for try {retry+1}");
                 return false;
             }
 

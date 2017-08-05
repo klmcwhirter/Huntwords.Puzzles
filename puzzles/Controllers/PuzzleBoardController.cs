@@ -1,31 +1,23 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using puzzles.Models;
 using puzzles.Repositories;
+using puzzles.Services;
 
 namespace puzzles.Controllers
 {
     [Route("api/[controller]")]
     public class PuzzleBoardController : Controller
     {
-        protected IGenerator<PuzzleBoard> PuzzleBoardGenerator { get; set; }
-        protected IPuzzlesRepository PuzzleRepository { get; set; }
+        protected PuzzleBoardCache PuzzleBoardCache { get; set; }
 
-        public PuzzleBoardController(
-            IGenerator<PuzzleBoard> puzzleBoardGenerator,
-            IPuzzlesRepository puzzleRepository
-        )
+        public PuzzleBoardController(PuzzleBoardCache puzzleBoardCache)
         {
-            PuzzleBoardGenerator = puzzleBoardGenerator;
-            PuzzleRepository = puzzleRepository;
+            PuzzleBoardCache = puzzleBoardCache;
         }
 
         // GET api/puzzleboard/3
         [HttpGet("{id}")]
-        public PuzzleBoard Get(int id)
-        {
-            var puzzle = PuzzleRepository.Get(id);
-            var rc = PuzzleBoardGenerator.Generate(puzzle);
-            return rc;
-        }
+        public PuzzleBoard Get(int id) => PuzzleBoardCache.Dequeue(id);
     }
 }

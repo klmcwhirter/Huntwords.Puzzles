@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace puzzles
 {
@@ -46,6 +47,10 @@ namespace puzzles
             services.AddMvc();
 
             Container = AddToAutofac(services);
+
+            // Start worker threads filling the cache
+            Task.Run(() => Container.Resolve<PuzzleBoardGeneratorManager>()?.FillQueues(false));
+
             var rc = new AutofacServiceProvider(Container);
             return rc;
         }
@@ -67,6 +72,8 @@ namespace puzzles
             // Add application services.
             builder.RegisterType<CharacterGenerator>().As<ICharacterGenerator>();
 
+            builder.RegisterType<PuzzleBoardCache>().AsSelf().SingleInstance();
+            builder.RegisterType<PuzzleBoardGeneratorManager>().AsSelf().SingleInstance();
             builder.RegisterType<PuzzleBoardGenerator>().As<IGenerator<PuzzleBoard>>();
             builder.RegisterType<PuzzleWordGenerator>().As<IGenerator<IList<PuzzleWord>>>();
 
@@ -84,10 +91,10 @@ namespace puzzles
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // Startup.cs(88,13): warning CS0618: 'ConsoleLoggerExtensions.AddConsole(ILoggerFactory, IConfiguration)' is obsolete: 'This method is obsolete and will be removed in a future version. The recommended alternative is to call the Microsoft.Extensions.Logging.AddConsole() extension method on the Microsoft.Extensions.Logging.LoggerFactory instance.' [/Users/klmcw/src/github.com/klmcwhirter/puzzle-service/puzzles/puzzles.csproj]
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            // loggerFactory.AddConsole(Configuration.GetSection("Logging"));
 
             // Startup.cs(89,13): warning CS0618: 'DebugLoggerFactoryExtensions.AddDebug(ILoggerFactory)' is obsolete: 'This method is obsolete and will be removed in a future version. The recommended alternative is to call the Microsoft.Extensions.Logging.AddDebug() extension method on the Microsoft.Extensions.Logging.LoggerFactory instance.' [/Users/klmcw/src/github.com/klmcwhirter/puzzle-service/puzzles/puzzles.csproj]
-            loggerFactory.AddDebug();
+            // loggerFactory.AddDebug();
 
             app.UseMvc();
         }
