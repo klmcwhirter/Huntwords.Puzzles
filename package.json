@@ -6,23 +6,20 @@
     "clean": "./buildctl clean",
 
     "build": "npm run publish && npm run docker-build",
-    "docker-build": "./buildctl docker-build debian.8-x64",
-    "publish": "./buildctl publish debian.8-x64",
-
-    "rmi": "./buildctl docker-rmi debian.8-x64",
-    "docker-start": "./buildctl docker-start debian.8-x64",
-    "docker-stop": "./buildctl docker-stop debian.8-x64",
+    "publish": "./buildctl publish linux-x64",
+    "docker-build": "./buildctl docker-build linux-x64",
+    "docker-rmi": "./buildctl docker-rmi linux-x64",
+    "docker-push": "./buildctl docker-push linux-x64",
+    
+    "docker-start": "./buildctl docker-start linux-x64",
+    "docker-stop": "./buildctl docker-stop linux-x64",
 
     "build-arm": "npm run publish-arm && npm run docker-build-arm",
-    "docker-build-arm": "./buildctl docker-build linux-arm",
     "publish-arm": "./buildctl publish linux-arm",
-    "scp-arm": "./buildctl scp linux-arm",
-    "rpi3": "npm run build-arm && npm run scp-arm",
-
-    "docker-push": "./buildctl docker-push debian.8-x64",
+    "docker-build-arm": "./buildctl docker-build linux-arm",
+    "docker-rmi-arm": "./buildctl docker-rmi linux-arm",    
     "docker-push-arm": "./buildctl docker-push linux-arm",
 
-    "docker-rmi-arm": "./buildctl docker-rmi linux-arm",
     "docker-start-arm": "./buildctl docker-start linux-arm",
     "docker-stop-arm": "./buildctl docker-stop linux-arm",
 

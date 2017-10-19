@@ -2,6 +2,7 @@
 #*------------------------------------------------------------------------------*
 #* Constants
 CMD=../$(basename $0)
+PROJROOT=$(dirname ${CMD})
 
 # Name of tye Docker Hub repository
 REPO=klmcwhirter
@@ -85,17 +86,16 @@ case $cmd in
   cp bin/Debug/netcoreapp2.0/puzzles.sqlite ${ROOT}/dist/${IMAGE}
   if [ "${arch}" = "arm32v7" ]
   then
-    log "Copying lib/libe_sqlite3.so ${ROOT}/dist/${IMAGE}"
-    cp lib/libe_sqlite3.so ${ROOT}/dist/${IMAGE}
-    log "Removing ${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib"
-    rm -f ${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib
+    log "Copying ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGE}"
+    cp ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGE}
+    if [ -f "${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib" ]
+    then
+      log "Removing ${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib"
+      rm -f ${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib
+    fi
   fi
   chmod +x ${ROOT}/dist/${IMAGE}/${EXE}
   cd ../..
-  tar czf /tmp/${IMAGE}-${arch}.tgz ${IMAGE}
-  ;;
-'scp')
-  $RPI3SCP /tmp/${IMAGE}-${arch}.tgz $RPI3PATH
   ;;
 'docker-build')
   ${CMD} docker-rmi $2

@@ -1,0 +1,3 @@
+[submodule "SQLitePCL.raw"]
+	path = SQLitePCL.raw
+	url = https://github.com/ericsink/SQLitePCL.raw
