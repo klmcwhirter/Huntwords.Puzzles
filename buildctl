@@ -1,20 +1,27 @@
 #!/bin/bash
 #*------------------------------------------------------------------------------*
+
+if [ $(basename "${PWD}") != "puzzles" ]
+then
+  cd puzzles
+fi
+
+#*------------------------------------------------------------------------------*
 #* Constants
 CMD=../$(basename $0)
 PROJROOT=$(dirname ${CMD})
 
-# Name of tye Docker Hub repository
+# Name of the Docker Hub repository
 REPO=klmcwhirter
 
-# Name of the Docker image to build
-IMAGE=puzzle-service
+# Base name of the Docker image to build
+IMAGEBASE=puzzle-service
 
 # Name of the executable
 EXE=puzzles
 
 # Name for the container to start
-CONTAINER=con${IMAGE}
+CONTAINER=con${IMAGEBASE}
 
 # Port # to map locally when starting the container
 PORT=5000
@@ -31,11 +38,15 @@ RPI3PATH=/home/klmcw/src/github.com/klmcwhirter
 arch=`echo $2 | sed 's/.*\(arm\).*/\1/'`
 if [ "${arch}" = "arm" ]
 then
-  arch=arm32v7
+  TARGET=arm32v7
 else
-  arch=x86_64
+  TARGET=x86_64
 fi
-dockerfile="Dockerfile.${arch}"
+dockerfile="Dockerfile.${TARGET}"
+
+version=$(jq -r '.version' ${PROJROOT}/package.json)
+
+IMAGE=${IMAGEBASE}-${TARGET}
 
 cmd=$1
 runtime=$2
@@ -55,11 +66,6 @@ function log
 #*---------------------------------------------------------------------------*
 
 log "$0 $*"
-
-if [ $(basename "${PWD}") != "puzzles" ]
-then
-  cd puzzles
-fi
 
 case $cmd in
 'build')
@@ -82,44 +88,46 @@ case $cmd in
   dotnet publish --self-contained $runtimeopts
   mkdir -p dist
   ROOT=${PWD}
-  mv bin/Debug/netcoreapp2.0/$runtime/publish ${ROOT}/dist/${IMAGE}
-  cp bin/Debug/netcoreapp2.0/puzzles.sqlite ${ROOT}/dist/${IMAGE}
-  if [ "${arch}" = "arm32v7" ]
+  mv bin/Debug/netcoreapp2.0/$runtime/publish ${ROOT}/dist/${IMAGEBASE}
+  cp bin/Debug/netcoreapp2.0/puzzles.sqlite ${ROOT}/dist/${IMAGEBASE}
+  if [ "${TARGET}" = "arm32v7" ]
   then
-    log "Copying ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGE}"
-    cp ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGE}
-    if [ -f "${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib" ]
+    log "Copying ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGEBASE}"
+    cp ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGEBASE}
+    if [ -f "${ROOT}/dist/${IMAGEBASE}/libe_sqlite3.dylib" ]
     then
-      log "Removing ${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib"
-      rm -f ${ROOT}/dist/${IMAGE}/libe_sqlite3.dylib
+      log "Removing ${ROOT}/dist/${IMAGEBASE}/libe_sqlite3.dylib"
+      rm -f ${ROOT}/dist/${IMAGEBASE}/libe_sqlite3.dylib
     fi
   fi
-  chmod +x ${ROOT}/dist/${IMAGE}/${EXE}
+  chmod +x ${ROOT}/dist/${IMAGEBASE}/${EXE}
   cd ../..
   ;;
 'docker-build')
+  ${CMD} build $2
   ${CMD} docker-rmi $2
 
-  log "BUILDING IMAGE ${REPO}/${IMAGE}:${arch}"
-  docker build --rm --force-rm -f $dockerfile -t ${REPO}/${IMAGE}:${arch} .
+  log "BUILDING IMAGE ${REPO}/${IMAGE}:${version}"
+  docker build --rm --force-rm -f $dockerfile -t ${REPO}/${IMAGE}:${version} .
+  ${CMD} k8s-replace-version
   ;;
 'docker-rmi')
   ${CMD} stop $2
 
-  docker inspect ${REPO}/${IMAGE}:${arch} >/dev/null 2>&1
+  docker inspect ${REPO}/${IMAGE}:${version} >/dev/null 2>&1
   if [ $? -eq 0 ]
   then
-    log "REMOVING IMAGE ${REPO}/${IMAGE}:${arch}"
-    docker rmi ${REPO}/${IMAGE}:${arch}
+    log "REMOVING IMAGE ${REPO}/${IMAGE}:${version}"
+    docker rmi ${REPO}/${IMAGE}:${version}
   fi
   ;;
 'docker-push')
-  log docker push klmcwhirter/${IMAGE}:${arch}
-  docker push klmcwhirter/${IMAGE}:${arch}
+  log docker push klmcwhirter/${IMAGE}:${version}
+  docker push klmcwhirter/${IMAGE}:${version}
   ;;
 'docker-start')
   log "STARTING ${CONTAINER} on port ${PORT}"
-  docker run -d --name ${CONTAINER} -p ${PORT}:5000 ${REPO}/${IMAGE}:${arch}
+  docker run -d --name ${CONTAINER} -p ${PORT}:5000 ${REPO}/${IMAGE}:${version}
   ;;
 'docker-stop')
   docker inspect ${CONTAINER} >/dev/null 2>&1
@@ -131,7 +139,10 @@ case $cmd in
   fi
   ;;
 'docker-push')
-  docker push ${REPO}/${IMAGE}:${arch}
+  docker push ${REPO}/${IMAGE}:${version}
+  ;;
+'k8s-replace-version')
+  sed "s/@VERSION@/${version}/g;s/@TARGET@/${TARGET}/g" ${PROJROOT}/k8s/dev/puzzle-service-deployment.yml.in >${PROJROOT}/k8s/dev/puzzle-service-deployment.yml
   ;;
 esac
 

@@ -1,11 +1,11 @@
 {
   "name": "puzzles",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "clean": "./buildctl clean",
 
-    "build": "npm run publish && npm run docker-build",
+    "build": "npm run publish",
     "publish": "./buildctl publish linux-x64",
     "docker-build": "./buildctl docker-build linux-x64",
     "docker-rmi": "./buildctl docker-rmi linux-x64",

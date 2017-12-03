@@ -13,7 +13,7 @@ namespace puzzles.Utils
             {
                 for (int n = array.Length - 1; n >= 0; n--)
                 {
-                    var k = array.Length.Random();;
+                    var k = array.Length.Random();
                     T temp = array[n];
                     array[n] = array[k];
                     array[k] = temp;

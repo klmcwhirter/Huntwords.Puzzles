@@ -12,11 +12,20 @@ namespace puzzles.Tests
         public class ArrayParameter
         {
             public object[] Array { get; set; }
+            public string Expected { get; set; }
         }
 
-        static readonly ArrayParameter IntArray = new ArrayParameter { Array = new object[] { 1, 3, 4, 9 } };
+        static readonly ArrayParameter IntArray = new ArrayParameter
+        {
+            Array = new object[] { 1, 3, 4, 9 },
+            Expected = "[ \"1\", \"3\", \"4\", \"9\" ]"
+        };
 
-        static readonly ArrayParameter StringArray = new ArrayParameter { Array = new object[] { "hello", "world", "this", "array" } };
+        static readonly ArrayParameter StringArray = new ArrayParameter
+        {
+            Array = new object[] { "hello", "world", "this", "array" },
+            Expected = "[ \"hello\", \"world\", \"this\", \"array\" ]"
+        };
 
         public static IEnumerable<object> ArraysMemberDataSource()
         {
