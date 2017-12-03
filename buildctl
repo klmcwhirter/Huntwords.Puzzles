@@ -92,8 +92,8 @@ case $cmd in
   cp bin/Debug/netcoreapp2.0/puzzles.sqlite ${ROOT}/dist/${IMAGEBASE}
   if [ "${TARGET}" = "arm32v7" ]
   then
-    log "Copying ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGEBASE}"
-    cp ${PROJROOT}/SQLitePCL.raw/linux/armhf/libe_sqlite3.so ${ROOT}/dist/${IMAGEBASE}
+    log "Copying lib/libe_sqlite3.so ${ROOT}/dist/${IMAGEBASE}"
+    cp lib/libe_sqlite3.so ${ROOT}/dist/${IMAGEBASE}
     if [ -f "${ROOT}/dist/${IMAGEBASE}/libe_sqlite3.dylib" ]
     then
       log "Removing ${ROOT}/dist/${IMAGEBASE}/libe_sqlite3.dylib"
