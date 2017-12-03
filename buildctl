@@ -104,7 +104,7 @@ case $cmd in
   cd ../..
   ;;
 'docker-build')
-  ${CMD} build $2
+  ${CMD} publish $2
   ${CMD} docker-rmi $2
 
   log "BUILDING IMAGE ${REPO}/${IMAGE}:${version}"
