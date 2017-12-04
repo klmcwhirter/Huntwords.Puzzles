@@ -24,4 +24,13 @@ spec:
             cpu: 100m
             memory: 100Mi
         ports:
-        - containerPort: 5000
+        - name: puzzle-service
+          containerPort: 5000
+        volumeMounts:
+        - mountPath: "/app/data"
+          name: puzzles-db
+      volumes:
+        - name: puzzles-db
+          hostPath:
+            path: @DATA@
+            type: Directory

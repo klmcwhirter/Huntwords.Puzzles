@@ -11,24 +11,7 @@ namespace puzzles.Models
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Topic> Topics { get; set; }
 
-        // Default value is required for dotnet ef database update
-        private string ConnectionString => GetDefaultConnectionString();
-
-        private string GetDefaultConnectionString()
-        {
-            // Do not use GetEntryAssembly() - will get wrong results with dotnet ef database update
-            var assembly = Assembly.GetCallingAssembly().Location;
-            var location = Path.GetDirectoryName(assembly);
-            var rc = $"Filename={location}/puzzles.sqlite";
-            return rc;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(ConnectionString);
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public PuzzlesDbContext(DbContextOptions<PuzzlesDbContext> options) : base(options)
         {
         }
     }

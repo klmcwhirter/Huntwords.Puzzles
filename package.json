@@ -4,27 +4,22 @@
   "license": "MIT",
   "scripts": {
     "clean": "./buildctl clean",
-
     "build": "npm run publish",
+    "build-db": "./buildctl build-db linux-x64",
     "publish": "./buildctl publish linux-x64",
     "docker-build": "./buildctl docker-build linux-x64",
     "docker-rmi": "./buildctl docker-rmi linux-x64",
     "docker-push": "./buildctl docker-push linux-x64",
-    
     "docker-start": "./buildctl docker-start linux-x64",
     "docker-stop": "./buildctl docker-stop linux-x64",
-
     "build-arm": "npm run publish-arm && npm run docker-build-arm",
     "publish-arm": "./buildctl publish linux-arm",
     "docker-build-arm": "./buildctl docker-build linux-arm",
-    "docker-rmi-arm": "./buildctl docker-rmi linux-arm",    
+    "docker-rmi-arm": "./buildctl docker-rmi linux-arm",
     "docker-push-arm": "./buildctl docker-push linux-arm",
-
     "docker-start-arm": "./buildctl docker-start linux-arm",
     "docker-stop-arm": "./buildctl docker-stop linux-arm",
-
     "test": "cd puzzles.Tests && dotnet restore && dotnet test",
-
     "start": "export ASPNETCORE_ENVIRONMENT=Development && export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -p puzzles/puzzles.csproj"
   },
   "private": true

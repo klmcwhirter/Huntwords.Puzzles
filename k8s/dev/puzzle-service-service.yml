@@ -7,10 +7,9 @@ metadata:
     tier: backend
     env: dev
 spec:
-  type: NodePort
   ports:
-    - port: 5000
-      nodePort: 32000
+    - port: 32000
+      targetPort: puzzle-service
   selector:
     app: puzzle-service
     tier: backend

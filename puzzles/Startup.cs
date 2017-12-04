@@ -46,6 +46,10 @@ namespace puzzles
             // Add framework services.
             services.AddMvc();
 
+            services.AddDbContext<PuzzlesDbContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("puzzles"))
+            );
+
             Container = AddToAutofac(services);
 
             // Start worker threads filling the cache
@@ -60,8 +64,6 @@ namespace puzzles
             var builder = new ContainerBuilder();
 
             // Add application repositories.
-            builder.RegisterType<PuzzlesDbContext>().AsSelf();
-
             builder.RegisterType<DbPuzzlesRepository>().AsSelf();
             builder.RegisterType<PuzzlesRepository>().As<IPuzzlesRepository>();
             builder.RegisterType<TagsRepository>().As<ITagsRepository>();

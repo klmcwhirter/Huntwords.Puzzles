@@ -21,7 +21,8 @@ namespace puzzles
                     factory.AddDebug();
                 })
                 .UseKestrel()
-                .UseUrls("http://*:5000/")
+                // TODO: when no longer need docker-compose remove the bind to 32000
+                .UseUrls("http://*:5000/;http://*:32000")
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

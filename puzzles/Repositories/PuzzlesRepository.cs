@@ -23,22 +23,22 @@ namespace puzzles.Repositories
 
         public Puzzle Add(Puzzle entity)
         {
-            throw new NotImplementedException();
+            return Repository.Add(entity);
         }
 
         public Puzzle AddWord(int id, string word)
         {
-            throw new NotImplementedException();
+            return Repository.AddWord(id, word);
         }
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            Repository.Delete(id);
         }
 
         public Puzzle DeleteWord(int id, int wordId)
         {
-            throw new NotImplementedException();
+            return Repository.DeleteWord(id, wordId);
         }
 
         public Puzzle Get(int id)
@@ -57,12 +57,12 @@ namespace puzzles.Repositories
 
         public void SaveChanges()
         {
-            throw new NotImplementedException();
+            Repository.SaveChanges();
         }
 
         public Puzzle Update(int id, Puzzle entity)
         {
-            throw new NotImplementedException();
+            return Repository.Update(id, entity);
         }
     }
 }
