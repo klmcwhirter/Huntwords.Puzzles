@@ -14,6 +14,8 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace puzzles
 {
@@ -45,6 +47,26 @@ namespace puzzles
 
             // Add framework services.
             services.AddMvc();
+
+            // Register the Swagger generator, defining one or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "puzzles API",
+                    Description = "A word search generator service application written in ASP.NET Core",
+                    TermsOfService = "None",
+                    Contact = new Contact { Name = "Kevin McWhirter", Email = "", Url = "https://github.com/klmcwhirter/puzzle-service" },
+                    License = new License { Name = "Use under MIT", Url = "https://github.com/klmcwhirter/puzzle-service/blob/master/LICENSE" }
+                });
+
+
+                // Set the comments path for the Swagger JSON and UI.
+                var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+                var xmlPath = Path.Combine(basePath, "puzzles.xml");
+                c.IncludeXmlComments(xmlPath);
+            });
 
             services.AddDbContext<PuzzlesDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("puzzles"))
@@ -99,6 +121,15 @@ namespace puzzles
             // loggerFactory.AddDebug();
 
             app.UseMvc();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "puzzles API V1");
+            });
         }
     }
 }

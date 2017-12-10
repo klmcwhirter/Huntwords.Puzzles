@@ -14,5 +14,8 @@ namespace puzzles.Models
 
         [DataMember]
         public string Word { get; set; }
+
+        [NotMapped]
+        public Puzzle Puzzle { get; set; }
     }
 }

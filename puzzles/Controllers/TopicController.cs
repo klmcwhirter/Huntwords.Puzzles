@@ -6,17 +6,33 @@ using puzzles.Services;
 
 namespace puzzles.Controllers
 {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// TopicsController
+    /// </summary>
+    [Produces("application/json")]
+    [Route("api/v1/topics")]
     public class TopicsController : Controller
     {
+        /// <summary>
+        /// TopicsRepository
+        /// </summary>
+        /// <returns>ITopicsRepository</returns>
         protected ITopicsRepository TopicRepository { get; set; }
 
+        /// <summary>
+        /// Construct TopicsController
+        /// </summary>
+        /// <param name="topicRepository"></param>
         public TopicsController(ITopicsRepository topicRepository)
         {
             TopicRepository = topicRepository;
         }
 
         // GET api/topic
+        /// <summary>
+        /// Gets all Topic definitions
+        /// </summary>
+        /// <returns>List of Topic instances; empty List on exception</returns>
         [HttpGet]
         public IEnumerable<Topic> Get()
         {
@@ -25,6 +41,11 @@ namespace puzzles.Controllers
         }
 
         // GET api/topic/5
+        /// <summary>
+        /// Gets a Topic definition using the TopicId passed in
+        /// </summary>
+        /// <param name="id">Id of the Topic</param>
+        /// <returns>Topic instance</returns>
         [HttpGet("{id}")]
         public Topic Get(int id)
         {
@@ -33,6 +54,11 @@ namespace puzzles.Controllers
         }
 
         // POST api/topic
+        /// <summary>
+        /// Adds a Topic definition
+        /// </summary>
+        /// <param name="topic">Topic definition</param>
+        /// <returns>Topic definition added</returns>
         [HttpPost]
         public IEnumerable<Topic> Post([FromBody]Topic topic)
         {
@@ -43,8 +69,13 @@ namespace puzzles.Controllers
         }
 
         // PUT api/topic/5
+        /// <summary>
+        /// Updates a Topic definition
+        /// </summary>
+        /// <param name="topic">Topic definition</param>
+        /// <returns>Topic definition added</returns>
         [HttpPut("{id}")]
-        public IEnumerable<Topic>  Put(int id, [FromBody]Topic topic)
+        public IEnumerable<Topic> Put(int id, [FromBody]Topic topic)
         {
             TopicRepository.Update(id, topic);
             TopicRepository.SaveChanges();
@@ -53,8 +84,13 @@ namespace puzzles.Controllers
         }
 
         // DELETE api/topic/5
+        /// <summary>
+        /// Deletes a Topic definition
+        /// </summary>
+        /// <param name="id">id of Topic definition to delete</param>
+        /// <returns>List of Topic definitions</returns>
         [HttpDelete("{id}")]
-        public IEnumerable<Topic>  Delete(int id)
+        public IEnumerable<Topic> Delete(int id)
         {
             TopicRepository.Delete(id);
             TopicRepository.SaveChanges();

@@ -51,7 +51,6 @@ namespace puzzles.Repositories
             foreach (var word in entity.PuzzleWords.ToArray())
             {
                 entity.PuzzleWords.Remove(word);
-                DbContext.PuzzleWords.Remove(word);
             }
             Logger.LogInformation($"DbPuzzleRepository.Delete({id}): PuzzleWords.Count={entity.PuzzleWords.Count}");
             

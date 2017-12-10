@@ -9,12 +9,29 @@ using puzzles.Services;
 
 namespace puzzles.Controllers
 {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// PuzzlesController
+    /// </summary>
+    [Produces("application/json")]
+    [Route("api/v1/puzzles")]
     public class PuzzlesController : Controller
     {
+        /// <summary>
+        /// PuzzlesRepository
+        /// </summary>
+        /// <returns>IPuzzlesRepository</returns>
         protected IPuzzlesRepository PuzzleRepository { get; set; }
-        public ILogger<PuzzlesController> Logger { get; }
+        /// <summary>
+        /// Logger
+        /// </summary>
+        /// <returns>ILogger&lt;PuzzlesController&gt;</returns>
+        protected ILogger<PuzzlesController> Logger { get; }
 
+        /// <summary>
+        /// Construct a PuzzlesController
+        /// </summary>
+        /// <param name="puzzleRepository">IPuzzlesRepository</param>
+        /// <param name="logger">ILogger</param>
         public PuzzlesController(IPuzzlesRepository puzzleRepository, ILogger<PuzzlesController> logger)
         {
             PuzzleRepository = puzzleRepository;
@@ -22,6 +39,10 @@ namespace puzzles.Controllers
         }
 
         // GET api/puzzle
+        /// <summary>
+        /// Gets all Puzzle definitions
+        /// </summary>
+        /// <returns>List of Puzzle instances; empty List on exception</returns>
         [HttpGet]
         public IEnumerable<Puzzle> Get()
         {
@@ -41,6 +62,11 @@ namespace puzzles.Controllers
         }
 
         // GET api/puzzle/5
+        /// <summary>
+        /// Gets a Puzzle definition using the PuzzleId passed in
+        /// </summary>
+        /// <param name="id">Id of the Puzzle</param>
+        /// <returns>Puzzle instance</returns>
         [HttpGet("{id}")]
         public Puzzle Get(int id)
         {
@@ -50,6 +76,11 @@ namespace puzzles.Controllers
 
 
         // POST api/puzzle
+        /// <summary>
+        /// Adds a Puzzle definition
+        /// </summary>
+        /// <param name="puzzle">Puzzle definition</param>
+        /// <returns>Puzzle definition added</returns>
         [HttpPost]
         public Puzzle Post([FromBody]Puzzle puzzle)
         {
@@ -59,6 +90,11 @@ namespace puzzles.Controllers
         }
 
         // PUT api/puzzle
+        /// <summary>
+        /// Updates a Puzzle definition
+        /// </summary>
+        /// <param name="puzzle">Puzzle definition</param>
+        /// <returns>Puzzle definition added</returns>
         [HttpPut]
         public Puzzle Put([FromBody]Puzzle puzzle)
         {
@@ -67,8 +103,14 @@ namespace puzzles.Controllers
             return rc;
         }
 
-        // PUT api/puzzles/{id}/addWord
-        [HttpPut("{id}/addWord")]
+        // PUT api/puzzles/{id}/words
+        /// <summary>
+        /// Adds a Puzzle word
+        /// </summary>
+        /// <param name="id">id of Puzzle definition into which to add word</param>
+        /// <param name="word">PuzzleWord definition</param>
+        /// <returns>Puzzle modified</returns>
+        [HttpPut("{id}/words")]
         public Puzzle AddWord(int id, [FromBody]PuzzleWord word)
         {
             var rc = PuzzleRepository.AddWord(id, word.Word);
@@ -76,8 +118,14 @@ namespace puzzles.Controllers
             return rc;
         }
 
-        // DELETE api/puzzles/{id}/deleteWord/{wordId}
-        [HttpDelete("{id}/deleteWord/{wordId}")]
+        // DELETE api/puzzles/{id}/words/{wordId}
+        /// <summary>
+        /// Deletes a Puzzle word
+        /// </summary>
+        /// <param name="id">id of Puzzle definition from which to delete word</param>
+        /// <param name="wordId">id of PuzzleWord to delete</param>
+        /// <returns>Puzzle modified</returns>
+        [HttpDelete("{id}/words/{wordId}")]
         public Puzzle DeleteWord(int id, int wordId)
         {
             var rc = PuzzleRepository.DeleteWord(id, wordId);
@@ -86,6 +134,11 @@ namespace puzzles.Controllers
         }
 
         // DELETE api/puzzle/5
+        /// <summary>
+        /// Deletes a Puzzle definition
+        /// </summary>
+        /// <param name="id">id of Puzzle definition to delete</param>
+        /// <returns>List of Puzzle definitions</returns>
         [HttpDelete("{id}")]
         public IEnumerable<Puzzle> Delete(int id)
         {

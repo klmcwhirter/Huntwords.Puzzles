@@ -14,5 +14,13 @@ namespace puzzles.Models
         public PuzzlesDbContext(DbContextOptions<PuzzlesDbContext> options) : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+            modelBuilder
+                .Entity<Puzzle>()
+                .HasMany(e => e.PuzzleWords)
+                .WithOne(e => e.Puzzle)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(true);
     }
 }
