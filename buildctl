@@ -122,8 +122,11 @@ case $cmd in
   mkdir -p ${PUZZLESDB}
   log cp ${DATAPUZZLESDB} ${PUZZLESDB}
   cp ${DATAPUZZLESDB} ${PUZZLESDB}
-  log ln -s ${ROOT}/${PUZZLESDB} ${PROJROOT}/data
-  ln -s ${ROOT}/${PUZZLESDB} ${PROJROOT}/data
+  (cd ${PROJROOT}; \
+  log rm -f data; \
+  rm -f data; \
+  log ln -s puzzles/${PUZZLESDB} data; \
+  ln -s puzzles/${PUZZLESDB} data)
   ;;
 'docker-build')
   ${CMD} publish $2
@@ -164,8 +167,7 @@ case $cmd in
   docker push ${REPO}/${IMAGE}:${version}
   ;;
 'k8s-replace-meta')
-  absRootPath=$(perl -e 'use Cwd "abs_path";print abs_path(shift)' ${PROJROOT})
-  sed "s?@DATA@?${absRootPath}/data?g;s/@TARGET@/${TARGET}/g;s/@VERSION@/${version}/g" \
+  sed "s/@TARGET@/${TARGET}/g;s/@VERSION@/${version}/g" \
     ${PROJROOT}/k8s/dev/puzzle-service-deployment.yml.in >${PROJROOT}/k8s/dev/puzzle-service-deployment.yml
   ;;
 esac
