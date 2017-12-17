@@ -68,8 +68,9 @@ namespace puzzles
                 c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddDbContext<PuzzlesDbContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("puzzles"))
+            services.AddDbContext<PuzzlesDbContext>(
+                options => options.UseSqlite(Configuration.GetConnectionString("puzzles")),
+                ServiceLifetime.Transient
             );
 
             Container = AddToAutofac(services);
