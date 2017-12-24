@@ -52,7 +52,10 @@ dockerfile="Dockerfile.${TARGET}"
 
 version=$(jq -r '.version' ${PROJROOT}/package.json)
 
-IMAGE=${IMAGEBASE}-${TARGET}
+IMAGE=${IMAGEBASE}
+
+TAG=${version}
+[ "${TARGET}" = "arm32v7" ] && TAG="${version}-${TARGET}"
 
 cmd=$1
 runtime=$2
@@ -132,27 +135,27 @@ case $cmd in
   ${CMD} publish $2
   ${CMD} docker-rmi $2
 
-  log "BUILDING IMAGE ${REPO}/${IMAGE}:${version}"
-  docker build --rm --force-rm -f $dockerfile -t ${REPO}/${IMAGE}:${version} .
+  log "BUILDING IMAGE ${REPO}/${IMAGE}:${TAG}"
+  docker build --rm --force-rm -f $dockerfile -t ${REPO}/${IMAGE}:${TAG} .
   ${CMD} k8s-replace-meta
   ;;
 'docker-rmi')
   ${CMD} stop $2
 
-  docker inspect ${REPO}/${IMAGE}:${version} >/dev/null 2>&1
+  docker inspect ${REPO}/${IMAGE}:${TAG} >/dev/null 2>&1
   if [ $? -eq 0 ]
   then
-    log "REMOVING IMAGE ${REPO}/${IMAGE}:${version}"
-    docker rmi ${REPO}/${IMAGE}:${version}
+    log "REMOVING IMAGE ${REPO}/${IMAGE}:${TAG}"
+    docker rmi ${REPO}/${IMAGE}:${TAG}
   fi
   ;;
 'docker-push')
-  log docker push klmcwhirter/${IMAGE}:${version}
-  docker push klmcwhirter/${IMAGE}:${version}
+  log docker push klmcwhirter/${IMAGE}:${TAG}
+  docker push klmcwhirter/${IMAGE}:${TAG}
   ;;
 'docker-start')
   log "STARTING ${CONTAINER} on port ${PORT}"
-  docker run -d --name ${CONTAINER} -p ${PORT}:5000 ${REPO}/${IMAGE}:${version}
+  docker run -d --name ${CONTAINER} -p ${PORT}:5000 ${REPO}/${IMAGE}:${TAG}
   ;;
 'docker-stop')
   docker inspect ${CONTAINER} >/dev/null 2>&1
@@ -164,11 +167,10 @@ case $cmd in
   fi
   ;;
 'docker-push')
-  docker push ${REPO}/${IMAGE}:${version}
+  docker push ${REPO}/${IMAGE}:${TAG}
   ;;
 'k8s-replace-meta')
-  sed "s/@TARGET@/${TARGET}/g;s/@VERSION@/${version}/g" \
-    ${PROJROOT}/k8s/dev/puzzle-service-deployment.yml.in >${PROJROOT}/k8s/dev/puzzle-service-deployment.yml
+  sed "s/@TARGET@/${TARGET}/g;s/@TAG@/${TAG}/g" ${PROJROOT}/k8s/puzzle-service.in.yml >${PROJROOT}/k8s/puzzle-service.yml
   ;;
 esac
 

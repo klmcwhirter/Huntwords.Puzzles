@@ -1,0 +1,78 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: puzzle-service-data
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    # Since minikube only supports hostPath at this time - hard code the macOS path
+    path: "/Users/klmcw/src/github.com/klmcwhirter/puzzle-service/puzzles/puzzles-db"
+    type: Directory
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ps-data-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: Deployment
+apiVersion: apps/v1beta1
+metadata:
+  name: puzzle-service
+spec:
+  selector:
+    matchLabels:
+      app: puzzle-service
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: puzzle-service
+        tier: backend
+    spec:
+      containers:
+      - name: puzzle-service
+        image: klmcwhirter/puzzle-service:@TAG@
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - name: puzzle-service
+          containerPort: 5000
+        volumeMounts:
+        - mountPath: "/app/data"
+          name: puzzles-db
+      volumes:
+        - name: puzzles-db
+          persistentVolumeClaim:
+            claimName: ps-data-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: puzzle-service
+  labels:
+    app: puzzle-service
+    tier: backend
+spec:
+  ports:
+    - port: 32000
+      targetPort: puzzle-service
+  selector:
+    app: puzzle-service
+    tier: backend
