@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.Extensions.PlatformAbstractions;
+using System.Threading.Tasks.Schedulers;
 
 namespace puzzles
 {
@@ -42,6 +43,7 @@ namespace puzzles
             // Adds services required for using options.
             services.AddOptions();
             // Register the IConfiguration instance which the Options classes bind against.
+            services.Configure<LimitedConcurrencyLevelTaskSchedulerOptions>(options => Configuration.GetSection("Tasks").Bind(options));
             services.Configure<PuzzleBoardGeneratorOptions>(options => Configuration.GetSection("Board").Bind(options));
             services.Configure<WordsRepositoryOptions>(options => Configuration.GetSection("Word").Bind(options));
 
@@ -76,7 +78,9 @@ namespace puzzles
             Container = AddToAutofac(services);
 
             // Start worker threads filling the cache
-            Task.Run(() => Container.Resolve<PuzzleBoardCacheManager>()?.FillQueues(false));
+            Task.Factory.StartNew(
+                () => Container.Resolve<PuzzleBoardCacheManager>()?.FillQueues(false),
+                TaskCreationOptions.LongRunning);
 
             var rc = new AutofacServiceProvider(Container);
             return rc;
@@ -95,10 +99,13 @@ namespace puzzles
             builder.RegisterType<WordsRepository>().As<IWordsRepository>().SingleInstance();
 
             // Add application services.
+            builder.RegisterType<LimitedConcurrencyLevelTaskScheduler>().As<TaskScheduler>().SingleInstance();
+
             builder.RegisterType<CharacterGenerator>().As<ICharacterGenerator>();
 
             builder.RegisterType<PuzzleBoardCache>().AsSelf().SingleInstance();
             builder.RegisterType<PuzzleBoardCacheManager>().AsSelf().SingleInstance();
+
             builder.RegisterType<PuzzleBoardGenerator>().As<IGenerator<PuzzleBoard>>();
             builder.RegisterType<PuzzleWordGenerator>().As<IGenerator<IList<PuzzleWord>>>();
 

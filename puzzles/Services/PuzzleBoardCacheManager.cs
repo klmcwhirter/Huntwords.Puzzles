@@ -42,6 +42,11 @@ namespace puzzles.Services
         /// </remarks>
         /// <returns></returns>
         protected Func<IPuzzlesRepository> PuzzleRepositoryFactory { get; }
+        /// <summary>
+        /// TaskScheduler used for the tasks executed by the Parallel.Invoke method call
+        /// </summary>
+        /// <returns></returns>
+        protected TaskScheduler TaskScheduler { get; }
 
         /// <summary>
         /// Provides CancellationToken for async methods
@@ -54,17 +59,20 @@ namespace puzzles.Services
         /// <param name="cache"></param>
         /// <param name="generatorFactory"></param>
         /// <param name="puzzleRepositoryFactory"></param>
+        /// <param name="taskScheduler"></param>
         /// <param name="logger"></param>
         public PuzzleBoardCacheManager(
             PuzzleBoardCache cache,
             Func<IGenerator<PuzzleBoard>> generatorFactory,
             Func<IPuzzlesRepository> puzzleRepositoryFactory,
+            TaskScheduler taskScheduler,
             ILogger<PuzzleBoardCacheManager> logger
         )
         {
             Cache = cache;
             GeneratorFactory = generatorFactory;
             PuzzleRepositoryFactory = puzzleRepositoryFactory;
+            TaskScheduler = taskScheduler;
             Logger = logger;
 
             Cache.PuzzleBoardQueueEmpty += (sender, id) => FillQueuesPriority(id, false);
@@ -155,8 +163,8 @@ namespace puzzles.Services
                     var pOpts = new ParallelOptions
                     {
                         CancellationToken = tokenSource.Token,
-                        MaxDegreeOfParallelism = 1, // Anything larger than 1 with just a few cores decreases performance tremendously
-                        TaskScheduler = null
+                        MaxDegreeOfParallelism = TaskScheduler.MaximumConcurrencyLevel,
+                        TaskScheduler = TaskScheduler
                     };
                     Parallel.Invoke(pOpts, actions.ToArray());
 
