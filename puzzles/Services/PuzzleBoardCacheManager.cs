@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,7 +14,7 @@ namespace puzzles.Services
     /// This class manages populating the PuzzleBoardCache by prefilling the cache via the FillQueues method
     /// and registering to the cache's events to refill the cache as it is depleted.
     /// </summary>
-    public class PuzzleBoardGeneratorManager
+    public class PuzzleBoardCacheManager
     {
         /// <summary>
         /// PuzzleBoardCache instance that holds the generated PuzzleBoard instances
@@ -32,7 +33,7 @@ namespace puzzles.Services
         /// ILogger instance for this class
         /// </summary>
         /// <returns></returns>
-        protected ILogger<PuzzleBoardGeneratorManager> Logger { get; set; }
+        protected ILogger<PuzzleBoardCacheManager> Logger { get; set; }
         /// <summary>
         /// Factory method to activate puzzle repository instances
         /// </summary>
@@ -43,17 +44,22 @@ namespace puzzles.Services
         protected Func<IPuzzlesRepository> PuzzleRepositoryFactory { get; }
 
         /// <summary>
-        /// Construct a PuzzleBoardGeneratorManager
+        /// Provides CancellationToken for async methods
+        /// </summary>
+        protected CancellationTokenSource tokenSource;
+
+        /// <summary>
+        /// Construct a PuzzleBoardCacheManager
         /// </summary>
         /// <param name="cache"></param>
         /// <param name="generatorFactory"></param>
         /// <param name="puzzleRepositoryFactory"></param>
         /// <param name="logger"></param>
-        public PuzzleBoardGeneratorManager(
+        public PuzzleBoardCacheManager(
             PuzzleBoardCache cache,
             Func<IGenerator<PuzzleBoard>> generatorFactory,
             Func<IPuzzlesRepository> puzzleRepositoryFactory,
-            ILogger<PuzzleBoardGeneratorManager> logger
+            ILogger<PuzzleBoardCacheManager> logger
         )
         {
             Cache = cache;
@@ -102,12 +108,14 @@ namespace puzzles.Services
         /// <param name="id"></param>
         /// <param name="verbose"></param>
         /// <returns></returns>
-        public async void FillQueuesPriority(int id, bool verbose)
+        public void FillQueuesPriority(int id, bool verbose)
         {
             Logger.LogInformation($"FillQueuesPriority({id}, {verbose}) starting");
 
-            var board = await GenerateAsync(id, verbose);
-            Cache.Enqueue(board);
+            var puzzleRepository = PuzzleRepositoryFactory();
+            var puzzle = puzzleRepository.Get(id);
+
+            AddPuzzleBoard(puzzle, verbose);
 
             FillQueues(verbose);
 
@@ -119,29 +127,40 @@ namespace puzzles.Services
         /// </summary>
         /// <param name="verbose"></param>
         /// <returns></returns>
-        public async void FillQueues(bool verbose)
+        public void FillQueues(bool verbose)
         {
             Logger.LogInformation("FillQueues starting");
 
             if (!IsFilling)
             {
                 IsFilling = true;
+                tokenSource = new CancellationTokenSource();
 
-                await Task.Run(async () =>
+                var puzzleRepository = PuzzleRepositoryFactory();
+                do
                 {
-                    var puzzleRepository = PuzzleRepositoryFactory();
-                    do
+                    Logger.LogInformation($"Populating Cache...");
+
+                    var actions = new List<Action>();
+
+                    foreach (var puzzle in puzzleRepository.GetAll().ToList())
                     {
-                        foreach (var puzzle in puzzleRepository.GetAll().ToList())
+                        if (!Cache.CacheFull(puzzle.Id))
                         {
-                            if (!Cache.CacheFull(puzzle.Id))
-                            {
-                                Logger.LogInformation($"Cache is not full for puzzleId={puzzle.Id}");
-                                await Task.Run(() => AddPuzzleBoard(puzzle, verbose));
-                            }
+                            Logger.LogInformation($"Cache is not full for puzzleId={puzzle.Id}");
+                            actions.Add(() => AddPuzzleBoard(puzzle, verbose));
                         }
-                    } while (Cache.Keys.Any((k) => !Cache.CacheFull(k)));
-                });
+                    }
+
+                    var pOpts = new ParallelOptions
+                    {
+                        CancellationToken = tokenSource.Token,
+                        MaxDegreeOfParallelism = 1, // Anything larger than 1 with just a few cores decreases performance tremendously
+                        TaskScheduler = null
+                    };
+                    Parallel.Invoke(pOpts, actions.ToArray());
+
+                } while (Cache.Keys.Any((k) => !Cache.CacheFull(k)));
 
                 IsFilling = false;
             }
@@ -165,20 +184,6 @@ namespace puzzles.Services
             var board = generator.Generate(puzzle, verbose);
             Cache.Enqueue(board);
             Logger.LogInformation($"Replenishing cache for puzzleId={puzzle.Id} - DONE.");
-        }
-
-        /// <summary>
-        /// Generate a PuzzleBoard asynchronously
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="verbose"></param>
-        /// <returns></returns>
-        public async Task<PuzzleBoard> GenerateAsync(int id, bool verbose)
-        {
-            var puzzleRepository = PuzzleRepositoryFactory();
-            var puzzle = puzzleRepository.Get(id);
-            var generator = GeneratorFactory();
-            return await Task.Run(() => generator.Generate(puzzle, verbose));
         }
     }
 }

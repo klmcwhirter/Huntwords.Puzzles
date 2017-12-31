@@ -76,7 +76,7 @@ namespace puzzles
             Container = AddToAutofac(services);
 
             // Start worker threads filling the cache
-            Task.Run(() => Container.Resolve<PuzzleBoardGeneratorManager>()?.FillQueues(false));
+            Task.Run(() => Container.Resolve<PuzzleBoardCacheManager>()?.FillQueues(false));
 
             var rc = new AutofacServiceProvider(Container);
             return rc;
@@ -98,7 +98,7 @@ namespace puzzles
             builder.RegisterType<CharacterGenerator>().As<ICharacterGenerator>();
 
             builder.RegisterType<PuzzleBoardCache>().AsSelf().SingleInstance();
-            builder.RegisterType<PuzzleBoardGeneratorManager>().AsSelf().SingleInstance();
+            builder.RegisterType<PuzzleBoardCacheManager>().AsSelf().SingleInstance();
             builder.RegisterType<PuzzleBoardGenerator>().As<IGenerator<PuzzleBoard>>();
             builder.RegisterType<PuzzleWordGenerator>().As<IGenerator<IList<PuzzleWord>>>();
 
