@@ -80,16 +80,18 @@ namespace puzzles.Services
             if (board == null)
             {
                 PuzzleBoardQueueEmpty?.Invoke(this, id);
-                Task.Delay(10000);
-                if (this.ContainsKey(id) && this[id].Count > 0)
+                Task.Delay(10000).ContinueWith((t) =>
                 {
-                    this[id].TryDequeue(out board);
-                }
+                    if (this.ContainsKey(id) && this[id].Count > 0)
+                    {
+                        this[id].TryDequeue(out board);
+                    }
 
-                if (board == null)
-                {
-                    Logger.LogInformation($"Board for Puzzle {id} did not appear in time.");
-                }
+                    if (board == null)
+                    {
+                        Logger.LogInformation($"Board for Puzzle {id} did not appear in time.");
+                    }
+                });
             }
 
             return board;

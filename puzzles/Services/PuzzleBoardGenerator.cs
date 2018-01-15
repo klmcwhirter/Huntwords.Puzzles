@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ namespace puzzles.Services
             { WordSlope.S , new PuzzlePoint( 0,  1) },
             { WordSlope.SW, new PuzzlePoint(-1,  1) },
             { WordSlope.W , new PuzzlePoint(-1,  0) },
-        };
+        }.ToImmutableDictionary();
 
         static WordSlope[] Directions => DirectionOffsets.Keys.ToArray();
         int MaxTries { get; set; }
