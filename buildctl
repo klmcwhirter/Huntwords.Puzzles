@@ -94,12 +94,14 @@ case $cmd in
   ./Data/loadsql.sh Data/V1.1.1__add_flowers.sql
   log ./Data/loadsql.sh Data/V1.1.2__add_fruit.sql
   ./Data/loadsql.sh Data/V1.1.2__add_fruit.sql
+  log ./Data/loadsql.sh Data/V1.1.3__add_bible.sql
+  ./Data/loadsql.sh Data/V1.1.3__add_bible.sql
   ;;
 'clean')
   rm -fr bin obj dist ${PUZZLESDB} ../data
   ;;
 'publish')
-  ${CMD} build $2
+  ${CMD} build-db $2
   log dotnet publish --self-contained $runtimeopts
   dotnet publish --self-contained $runtimeopts
   log mkdir -p dist
@@ -117,14 +119,11 @@ case $cmd in
       rm -f ${ROOT}/dist/${IMAGEBASE}/libe_sqlite3.dylib
     fi
   fi
-  mkdir -p ${ROOT}/dist/${IMAGEBASE}/data
   chmod +x ${ROOT}/dist/${IMAGEBASE}/${EXE}
 
   log Setup local development
   log mkdir -p ${PUZZLESDB}
   mkdir -p ${PUZZLESDB}
-  log cp ${DATAPUZZLESDB} ${PUZZLESDB}
-  cp ${DATAPUZZLESDB} ${PUZZLESDB}
   (cd ${PROJROOT}; \
   log rm -f data; \
   rm -f data; \
@@ -134,6 +133,17 @@ case $cmd in
 'docker-build')
   ${CMD} publish $2
   ${CMD} docker-rmi $2
+
+  # for docker-compose
+  ROOT=${PWD}
+  mkdir -p ${ROOT}/dist/${IMAGEBASE}/data
+  log cp ${DATAPUZZLESDB} ${ROOT}/dist/${IMAGEBASE}/data
+  cp ${DATAPUZZLESDB} ${ROOT}/dist/${IMAGEBASE}/data
+  ls -l  ${ROOT}/dist/${IMAGEBASE}/data
+
+  # for kubernetes
+  log cp ${DATAPUZZLESDB} ${PUZZLESDB}
+  cp ${DATAPUZZLESDB} ${PUZZLESDB}
 
   log "BUILDING IMAGE ${REPO}/${IMAGE}:${TAG}"
   docker build --rm --force-rm -f $dockerfile -t ${REPO}/${IMAGE}:${TAG} .
