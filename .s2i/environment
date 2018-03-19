@@ -1,2 +1,2 @@
-example DOTNET_STARTUP_PROJECT=puzzles/puzzles.csproj
+DOTNET_STARTUP_PROJECT=puzzles/puzzles.csproj
 
