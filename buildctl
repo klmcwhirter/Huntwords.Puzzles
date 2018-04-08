@@ -27,7 +27,7 @@ CONTAINER=con${IMAGEBASE}
 PORT=5000
 
 # Path to the source puzzles.sqlite file - build-db creates this
-DATAPUZZLESDB=./Data/puzzles.sqlite
+DATAPUZZLESDB=./data/puzzles.sqlite
 
 # Directory holding the puzzles.sqlite file after build
 PUZZLESDB=puzzles-db
@@ -101,7 +101,7 @@ case $cmd in
   rm -fr bin obj dist ${PUZZLESDB} ../data
   ;;
 'publish')
-  ${CMD} build-db $2
+  # ${CMD} build-db $2
   log dotnet publish --self-contained $runtimeopts
   dotnet publish --self-contained $runtimeopts
   log mkdir -p dist
