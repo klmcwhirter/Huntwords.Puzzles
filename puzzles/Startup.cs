@@ -47,6 +47,9 @@ namespace puzzles
             services.Configure<PuzzleBoardGeneratorOptions>(options => Configuration.GetSection("Board").Bind(options));
             services.Configure<WordsRepositoryOptions>(options => Configuration.GetSection("Word").Bind(options));
 
+            // Add CORS support
+            services.AddCors();
+
             // Add framework services.
             services.AddMvc();
 
@@ -127,6 +130,21 @@ namespace puzzles
 
             // Startup.cs(89,13): warning CS0618: 'DebugLoggerFactoryExtensions.AddDebug(ILoggerFactory)' is obsolete: 'This method is obsolete and will be removed in a future version. The recommended alternative is to call the Microsoft.Extensions.Logging.AddDebug() extension method on the Microsoft.Extensions.Logging.LoggerFactory instance.' [/Users/klmcw/src/github.com/klmcwhirter/puzzle-service/puzzles/puzzles.csproj]
             // loggerFactory.AddDebug();
+
+            app.UseCors(builder =>
+            {
+                var originsString = Configuration.GetValue<string>("PUZZLE_SERVICE_ORIGINS") ?? "http://huntwords";
+                Logger.LogInformation($"Configured to use these CORS origins={originsString}");
+
+                var origins = originsString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                builder.WithOrigins(origins);
+
+                builder.WithMethods("GET", "POST", "PUT", "DELETE");
+
+                builder.AllowAnyHeader();
+
+                builder.AllowCredentials();
+            });
 
             app.UseMvc();
 
