@@ -42,18 +42,24 @@ namespace puzzles.Tests
             //Given
             var arr = (object[])origArr.Clone();
 
-            //When
-            arr.Shuffle();
-
-            //Then
+            var retryCt = 0;
             var diff = false;
-            for (int i = 0; i < origArr.Length; i++)
+            do
             {
-                if (((IComparable)origArr[i]).CompareTo(((IComparable)arr[i])) != 0)
+                //When
+                arr.Shuffle();
+
+                //Then
+                for (int i = 0; i < origArr.Length; i++)
                 {
-                    diff = true;
+                    if (((IComparable)origArr[i]).CompareTo(((IComparable)arr[i])) != 0)
+                    {
+                        diff = true;
+                    }
                 }
-            }
+            // Retry a couple of times in case the random # generator just happened to shuffle them exactly like orig
+            } while (!diff && (retryCt++ < 2));
+
             var origStr = origArr.ToMessageString();
             var arrStr = arr.ToMessageString();
 
