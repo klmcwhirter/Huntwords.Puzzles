@@ -1,3 +1,4 @@
+#pragma warning disable CS1572, CS1573, CS1591
 namespace puzzles.Models
 {
     // Indicates the angle of the word placement in the matrix

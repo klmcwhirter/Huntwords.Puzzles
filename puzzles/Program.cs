@@ -1,3 +1,4 @@
+#pragma warning disable CS1572, CS1573, CS1591
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;

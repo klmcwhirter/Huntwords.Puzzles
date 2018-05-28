@@ -1,3 +1,4 @@
+#pragma warning disable CS1572, CS1573, CS1591
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using puzzles.Models;
