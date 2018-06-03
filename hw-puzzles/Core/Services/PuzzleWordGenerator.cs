@@ -9,9 +9,14 @@ namespace hwpuzzles.Core.Services
 {
     public class PuzzleWordGenerator : IGenerator<IList<string>>
     {
-        protected IIndex<string, string> WordGenerators { get; }
+        protected IIndex<string, IGenerator<string>> WordGenerators { get; }
+        protected IGenerator<string> GetGenerator(Puzzle puzzle) => 
+            puzzle.Name == WordGeneratorsNamesProvider.Word ? WordGenerators[puzzle.Name] :
+            puzzle.Name == WordGeneratorsNamesProvider.Random ? WordGenerators[puzzle.Name] :
+            WordGenerators[WordGeneratorsNamesProvider.Cached];
+
         public PuzzleWordGenerator(
-            IIndex<string, string> wordGenerators)
+            IIndex<string, IGenerator<string>> wordGenerators)
         {
             WordGenerators = wordGenerators;
         }
@@ -24,7 +29,7 @@ namespace hwpuzzles.Core.Services
             var rc = new List<string>();
             var displayedWords = new List<string>();
             var letterCount = (int)(boardOptions.MaxWidth * boardOptions.MaxHeight * boardOptions.WordDensity);
-            IGenerator<string> wordGenerator = null; // TODO: SelectWordGenerator(puzzle);
+            IGenerator<string> wordGenerator = GetGenerator(puzzle);
 
             do
             {

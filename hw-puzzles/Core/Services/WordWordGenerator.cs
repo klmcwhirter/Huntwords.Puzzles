@@ -6,7 +6,7 @@ using hwpuzzles.Core.Models;
 namespace hwpuzzles.Core.Services
 {
     [DataContract]
-    public class WordWordGenerator
+    public class WordWordGenerator : IGenerator<string>
     {
         public Puzzle Puzzle { get; }
 
@@ -14,7 +14,7 @@ namespace hwpuzzles.Core.Services
         {
             Puzzle = new Puzzle
             {
-                Name = "Word",
+                Name = WordGeneratorsNamesProvider.Word,
                 Description = "Puzzle containing a list of the word WORD",
                 PuzzleWords = new List<string>()
             };

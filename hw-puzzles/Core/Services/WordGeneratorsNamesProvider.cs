@@ -7,15 +7,19 @@ namespace hwpuzzles.Core.Services
 {
     public static class WordGeneratorsNamesProvider
     {
+        public static readonly string Cached = "Cached";
+        public static readonly string Random = "Random";
+        public static readonly string Word = "Word";
+
         public static string[] Names { get; }
 
         static WordGeneratorsNamesProvider()
         {
             Names = new[]
             {
-                "cached",
-                "random",
-                "word"
+                Cached,
+                Random,
+                Word
             };
         }
     }

@@ -9,7 +9,7 @@ using hwpuzzles.Core.Utils;
 namespace hwpuzzles.Core.Services
 {
     [DataContract]
-    public class RandomWordGenerator
+    public class RandomWordGenerator : IGenerator<string>
     {
         public Puzzle Puzzle { get; }
 
@@ -20,7 +20,7 @@ namespace hwpuzzles.Core.Services
             WordRepository = wordRepository;
             Puzzle = new Puzzle
             {
-                Name = "random",
+                Name = WordGeneratorsNamesProvider.Random,
                 Description = "Puzzle containing a randomly selected list of words",
                 PuzzleWords = new List<string>()
             };

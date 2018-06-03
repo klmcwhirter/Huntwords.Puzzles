@@ -112,6 +112,10 @@ namespace puzzles
             builder.RegisterType<PuzzleBoardGenerator>().As<IGenerator<PuzzleBoard>>();
             builder.RegisterType<PuzzleWordGenerator>().As<IGenerator<IList<string>>>();
 
+            builder.RegisterType<RedisPuzzleWordGenerator>().Named<IGenerator<string>>(WordGeneratorsNamesProvider.Cached);
+            builder.RegisterType<RandomWordGenerator>().Named<IGenerator<string>>(WordGeneratorsNamesProvider.Random);
+            builder.RegisterType<WordWordGenerator>().Named<IGenerator<string>>(WordGeneratorsNamesProvider.Word);
+
             builder.Populate(services);
             var rc = builder.Build();
             return rc;
@@ -123,7 +127,7 @@ namespace puzzles
             var password = password64; // Encoding.UTF8.GetString(Convert.FromBase64String(password64));
             var redisHost = Configuration.GetValue<string>("REDIS_SERVICE_HOST");
             var redisPort = Configuration.GetValue<string>("REDIS_SERVICE_PORT");
-            var rc = $"{password}@{redisHost}:{redisPort}";
+            var rc = $"redis://{password}@{redisHost}:{redisPort}";
             return rc;
         }
 

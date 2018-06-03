@@ -10,12 +10,12 @@ using hwpuzzles.Core.Utils;
 namespace hwpuzzles.Core.Services
 {
     [DataContract]
-    public class DbPuzzleWordGenerator
+    public class RedisPuzzleWordGenerator : IGenerator<string>
     {
-        protected ILogger<DbPuzzleWordGenerator> Logger { get; }
+        protected ILogger<RedisPuzzleWordGenerator> Logger { get; }
         protected IPuzzlesRepository Repository { get; }
 
-        public DbPuzzleWordGenerator(IPuzzlesRepository repository, ILogger<DbPuzzleWordGenerator> logger)
+        public RedisPuzzleWordGenerator(IPuzzlesRepository repository, ILogger<RedisPuzzleWordGenerator> logger)
         {
             Repository = repository;
             Logger = logger;
