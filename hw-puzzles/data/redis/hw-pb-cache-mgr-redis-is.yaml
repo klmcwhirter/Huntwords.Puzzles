@@ -1,0 +1,20 @@
+kind: ImageStream
+apiVersion: v1
+metadata:
+  annotations:
+    openshift.io/display-name: "Redis Image"
+  name: redis
+  creationTimestamp: 
+spec:
+  dockerImageRepository: docker.io/redis
+  tags:
+  - name: latest
+    annotations:
+      description: Image for redis:latest
+      iconClass: icon-
+      supports: redis, redis:1
+      tags: redis
+      version: '1'
+    from:
+      kind: ImageStreamTag
+      name: latest
