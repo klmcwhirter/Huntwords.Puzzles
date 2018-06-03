@@ -11,6 +11,14 @@ namespace hwpuzzles.Controllers
     [Route("api/v1/puzzleboard")]
     public class PuzzleBoardController : Controller
     {
+        public IGenerator<PuzzleBoard> PbGenerator { get; }
+        
+        public PuzzleBoardController(IGenerator<PuzzleBoard> pbGenerator)
+        {
+            PbGenerator = pbGenerator;
+        }
+
+
         // GET api/puzzleboard/3
         /// <summary>
         /// Gets a generated PuzzleBoard using the PuzzleId passed in
@@ -18,6 +26,6 @@ namespace hwpuzzles.Controllers
         /// <param name="id">Id of the Puzzle to generate</param>
         /// <returns>PuzzleBoard instance</returns>
         [HttpGet("{id}")]
-        public PuzzleBoard Get(int id) => null;
+        public PuzzleBoard Get(int id) => PbGenerator.Generate(id, false);
     }
 }
