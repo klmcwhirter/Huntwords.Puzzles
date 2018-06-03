@@ -91,10 +91,15 @@ namespace puzzles
             // Add Redis services
             var redisUrl = GetRedisUrl();
             builder.Register<IRedisClientsManager>(c => new PooledRedisClientManager(redisUrl)).As<IRedisClientsManager>();
-            builder.Register<IRedisTypedClient<Puzzle>>(c =>
+            builder.Register<IRedisClient>(c =>
             {
                 var mgr = c.Resolve<IRedisClientsManager>();
                 var client = mgr.GetClient();
+                return client;
+            }).As<IRedisClient>();
+            builder.Register<IRedisTypedClient<Puzzle>>(c =>
+            {
+                var client = c.Resolve<IRedisClient>();
                 var typedClient = client.As<Puzzle>();
                 return typedClient;
             }).As<IRedisTypedClient<Puzzle>>();
