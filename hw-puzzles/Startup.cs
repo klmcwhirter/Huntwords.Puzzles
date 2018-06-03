@@ -45,7 +45,6 @@ namespace puzzles
             services.AddOptions();
             // Register the IConfiguration instance which the Options classes bind against.
             services.Configure<PuzzleBoardGeneratorOptions>(options => Configuration.GetSection("Board").Bind(options));
-            services.Configure<WordsRepositoryOptions>(options => Configuration.GetSection("Word").Bind(options));
 
             // Add CORS support
             services.AddCors();
