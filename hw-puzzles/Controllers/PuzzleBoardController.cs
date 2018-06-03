@@ -19,13 +19,13 @@ namespace hwpuzzles.Controllers
         }
 
 
-        // GET api/puzzleboard/3
+        // GET api/puzzleboard/Fruit
         /// <summary>
         /// Gets a generated PuzzleBoard using the PuzzleId passed in
         /// </summary>
         /// <param name="name">Name of the Puzzle to generate</param>
         /// <returns>PuzzleBoard instance</returns>
-        [HttpGet("{id}")]
+        [HttpGet("{name}")]
         public PuzzleBoard Get(string name) => PbGenerator.Generate(name, false);
     }
 }
