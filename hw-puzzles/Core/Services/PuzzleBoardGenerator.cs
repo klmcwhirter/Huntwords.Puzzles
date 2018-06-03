@@ -65,6 +65,9 @@ namespace hwpuzzles.Core.Services
                 Puzzle = puzzle
             };
 
+            Logger.LogInformation($"puzzle={puzzle}");
+            Logger.LogInformation($"PuzzleWordGenerator={PuzzleWordGenerator}");
+
             var words = PuzzleWordGenerator.Generate(puzzle, Options);
 
             // No sense in trying more cells than exist in the grid
