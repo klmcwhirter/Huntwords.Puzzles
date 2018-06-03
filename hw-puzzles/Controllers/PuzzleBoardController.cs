@@ -23,9 +23,9 @@ namespace hwpuzzles.Controllers
         /// <summary>
         /// Gets a generated PuzzleBoard using the PuzzleId passed in
         /// </summary>
-        /// <param name="id">Id of the Puzzle to generate</param>
+        /// <param name="name">Name of the Puzzle to generate</param>
         /// <returns>PuzzleBoard instance</returns>
         [HttpGet("{id}")]
-        public PuzzleBoard Get(int id) => PbGenerator.Generate(id, false);
+        public PuzzleBoard Get(string name) => PbGenerator.Generate(name, false);
     }
 }

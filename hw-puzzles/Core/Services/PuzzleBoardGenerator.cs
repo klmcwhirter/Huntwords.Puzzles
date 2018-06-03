@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using hwpuzzles.Core.Models;
 using hwpuzzles.Core.Utils;
+using hwpuzzles.Core.Repositories;
 
 namespace hwpuzzles.Core.Services
 {
@@ -27,17 +28,20 @@ namespace hwpuzzles.Core.Services
         static WordSlope[] Directions => DirectionOffsets.Keys.ToArray();
         int MaxTries { get; set; }
         int MinDiagonals { get; set; }
+        IPuzzlesRepository PuzzlesRepository { get; }
         ICharacterGenerator CharacterGenerator { get; }
         IGenerator<IList<string>> PuzzleWordGenerator { get; }
         PuzzleBoardGeneratorOptions Options { get; set; }
         ILogger<PuzzleBoardGenerator> Logger { get; }
 
         public PuzzleBoardGenerator(
-          ICharacterGenerator characterGenerator,
-          IGenerator<IList<string>> puzzleWordGenerator,
-          IOptions<PuzzleBoardGeneratorOptions> options,
-          ILogger<PuzzleBoardGenerator> logger)
+            IPuzzlesRepository puzzlesRepository,
+            ICharacterGenerator characterGenerator,
+            IGenerator<IList<string>> puzzleWordGenerator,
+            IOptions<PuzzleBoardGeneratorOptions> options,
+            ILogger<PuzzleBoardGenerator> logger)
         {
+            PuzzlesRepository = puzzlesRepository;
             CharacterGenerator = characterGenerator;
             PuzzleWordGenerator = puzzleWordGenerator;
             Options = options.Value;
@@ -46,8 +50,10 @@ namespace hwpuzzles.Core.Services
 
         public PuzzleBoard Generate(params object[] options)
         {
-            var puzzle = (Puzzle)options[0];
+            var name = (string)options[0];
             var verbose = (bool)options[1];
+
+            var puzzle = PuzzlesRepository.Get(name);
 
             // Some algorithms try to do fancy things like sort the word list in reverse length order
             // This generates placements that rarely include diagonal directions. Just say no!
@@ -85,7 +91,7 @@ namespace hwpuzzles.Core.Services
                     continue;
                 }
 
-                if(verbose) Logger.LogInformation($"Found a solution for puzzle={rc.Puzzle.Name} after {retry} tries");
+                if (verbose) Logger.LogInformation($"Found a solution for puzzle={rc.Puzzle.Name} after {retry} tries");
                 break; // phew found a solution
             }
 
@@ -96,7 +102,7 @@ namespace hwpuzzles.Core.Services
 
         private WordSolution PlaceWord(PuzzleBoard board, string word, bool verbose)
         {
-            if(verbose) Logger.LogDebug($"Placing word={word}");
+            if (verbose) Logger.LogDebug($"Placing word={word}");
 
             var rc = new WordSolution
             {
@@ -132,7 +138,7 @@ namespace hwpuzzles.Core.Services
                         {
                             WordCopyToBoard(word, board, dirOffsets, x, y);
 
-                            if(verbose) Logger.LogDebug($"{word} was placed @ ({x},{y}) via {wordSlope} for puzzle={board.Puzzle.Name} in {tries} tries");
+                            if (verbose) Logger.LogDebug($"{word} was placed @ ({x},{y}) via {wordSlope} for puzzle={board.Puzzle.Name} in {tries} tries");
 
                             rc.Placed = true;
                             rc.WordSlope = wordSlope;
@@ -144,7 +150,7 @@ namespace hwpuzzles.Core.Services
                 }
             }
 
-            if(verbose) Logger.LogDebug($"{word} was not placed in {tries} tries");
+            if (verbose) Logger.LogDebug($"{word} was not placed in {tries} tries");
 
             return rc;
         }
@@ -171,7 +177,7 @@ namespace hwpuzzles.Core.Services
             // If any words were not placed - try again
             if (solutions.Any(s => !s.Placed))
             {
-                if(verbose) Logger.LogError($">>>> At least 1 word was not placed for puzzle={board.Puzzle.Name} - retrying for try {retry+1}");
+                if (verbose) Logger.LogError($">>>> At least 1 word was not placed for puzzle={board.Puzzle.Name} - retrying for try {retry + 1}");
                 return false;
             }
 
@@ -179,7 +185,7 @@ namespace hwpuzzles.Core.Services
             var numDiags = solutions.CountDirection(new[] { WordSlope.NW, WordSlope.NW, WordSlope.SW, WordSlope.SE });
             if (numDiags < MinDiagonals)
             {
-                if(verbose) Logger.LogError($">>>> There were not enough diagonal placements for puzzle={board.Puzzle.Name} - wanting at least {MinDiagonals} but got {numDiags} - retrying for try {retry+1}");
+                if (verbose) Logger.LogError($">>>> There were not enough diagonal placements for puzzle={board.Puzzle.Name} - wanting at least {MinDiagonals} but got {numDiags} - retrying for try {retry + 1}");
                 return false;
             }
 
@@ -187,7 +193,7 @@ namespace hwpuzzles.Core.Services
             var numVerts = solutions.CountDirection(new[] { WordSlope.N, WordSlope.S });
             if (numVerts < 1)
             {
-                if(verbose) Logger.LogError($">>>> There were no vertical placements for puzzle={board.Puzzle.Name} - retrying for try {retry+1}");
+                if (verbose) Logger.LogError($">>>> There were no vertical placements for puzzle={board.Puzzle.Name} - retrying for try {retry + 1}");
                 return false;
             }
 
@@ -195,7 +201,7 @@ namespace hwpuzzles.Core.Services
             var numHoriz = solutions.CountDirection(new[] { WordSlope.W, WordSlope.E });
             if (numHoriz < 1)
             {
-                if(verbose) Logger.LogError($">>>> There were no horizontal placements for puzzle={board.Puzzle.Name} - retrying for try {retry+1}");
+                if (verbose) Logger.LogError($">>>> There were no horizontal placements for puzzle={board.Puzzle.Name} - retrying for try {retry + 1}");
                 return false;
             }
 
