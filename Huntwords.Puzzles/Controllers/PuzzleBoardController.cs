@@ -1,8 +1,10 @@
+#pragma warning disable CS1572, CS1573, CS1591
 using System.Threading.Tasks;
+using Huntwords.Common.Models;
+using Huntwords.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using hwpuzzles.Core.Models;
 
-namespace hwpuzzles.Controllers
+namespace Huntwords.Puzzles.Controllers
 {
     /// <summary>
     /// PuzzleBoardController
@@ -11,11 +13,10 @@ namespace hwpuzzles.Controllers
     [Route("api/v1/puzzleboard")]
     public class PuzzleBoardController : Controller
     {
-        public IGenerator<PuzzleBoard> PbGenerator { get; }
-        
-        public PuzzleBoardController(IGenerator<PuzzleBoard> pbGenerator)
+        protected IPuzzleBoardRepository Repository { get; }
+        public PuzzleBoardController(IPuzzleBoardRepository repository)
         {
-            PbGenerator = pbGenerator;
+            this.Repository = repository;
         }
 
 
@@ -26,6 +27,6 @@ namespace hwpuzzles.Controllers
         /// <param name="name">Name of the Puzzle to generate</param>
         /// <returns>PuzzleBoard instance</returns>
         [HttpGet("{name}")]
-        public PuzzleBoard Get(string name) => PbGenerator.Generate(name, false);
+        public PuzzleBoard Get(string name) => Repository.Pop(name);
     }
 }

@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using hwpuzzles.Core.Models;
-using hwpuzzles.Core.Repositories;
-using hwpuzzles.Core.Services;
+using Huntwords.Common.Models;
+using Huntwords.Common.Repositories;
+using Huntwords.Common.Services;
+using Huntwords.Common.Utils;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ using ServiceStack.Redis;
 using ServiceStack.Redis.Generic;
 using System.Text;
 
-namespace puzzles
+namespace Huntwords.Puzzles
 {
     public class Startup
     {
@@ -43,8 +44,6 @@ namespace puzzles
         {
             // Adds services required for using options.
             services.AddOptions();
-            // Register the IConfiguration instance which the Options classes bind against.
-            services.Configure<PuzzleBoardGeneratorOptions>(options => Configuration.GetSection("Board").Bind(options));
 
             // Add CORS support
             services.AddCors();
@@ -67,18 +66,11 @@ namespace puzzles
 
                 // Set the comments path for the Swagger JSON and UI.
                 var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-                var xmlPath = Path.Combine(basePath, "hw-puzzles.xml");
+                var xmlPath = Path.Combine(basePath, "Huntwords.Puzzles.xml");
                 c.IncludeXmlComments(xmlPath);
             });
 
             Container = AddToAutofac(services);
-
-#if MOVE_TO_HW_PB_CACHE
-            // Start worker threads filling the cache
-            Task.Factory.StartNew(
-                () => Container.Resolve<PuzzleBoardCacheManager>()?.FillQueues(false),
-                TaskCreationOptions.LongRunning);
-#endif
 
             var rc = new AutofacServiceProvider(Container);
             return rc;
@@ -88,51 +80,12 @@ namespace puzzles
         {
             var builder = new ContainerBuilder();
 
-            // Add Redis services
-            var redisUrl = GetRedisUrl();
-            builder.Register<IRedisClientsManager>(c => new PooledRedisClientManager(redisUrl)).As<IRedisClientsManager>();
-            builder.Register<IRedisClient>(c =>
-            {
-                var mgr = c.Resolve<IRedisClientsManager>();
-                var client = mgr.GetClient();
-                return client;
-            }).As<IRedisClient>();
-            builder.Register<IRedisTypedClient<Puzzle>>(c =>
-            {
-                var client = c.Resolve<IRedisClient>();
-                var typedClient = client.As<Puzzle>();
-                return typedClient;
-            }).As<IRedisTypedClient<Puzzle>>();
-
-            // Add application repositories.
-            builder.RegisterType<RedisPuzzlesRepository>().As<IPuzzlesRepository>();
-            builder.RegisterType<TagsRepository>().As<ITagsRepository>();
-            builder.RegisterType<TopicsRepository>().As<ITopicsRepository>();
-
-            builder.RegisterType<WordsRepository>().As<IWordsRepository>().SingleInstance();
-
-            // Add application services.
-            builder.RegisterType<CharacterGenerator>().As<ICharacterGenerator>();
-
-            builder.RegisterType<PuzzleBoardGenerator>().As<IGenerator<PuzzleBoard>>();
-            builder.RegisterType<PuzzleWordGenerator>().As<IGenerator<IList<string>>>();
-
-            builder.RegisterType<RedisPuzzleWordGenerator>().Named<IGenerator<string>>(WordGeneratorsNamesProvider.Cached);
-            builder.RegisterType<RandomWordGenerator>().Named<IGenerator<string>>(WordGeneratorsNamesProvider.Random);
-            builder.RegisterType<WordWordGenerator>().Named<IGenerator<string>>(WordGeneratorsNamesProvider.Word);
+            builder.RegisterCommonRedis(Configuration);
+            builder.RegisterCommonRepositories();
+            builder.RegisterCommonServices();
 
             builder.Populate(services);
             var rc = builder.Build();
-            return rc;
-        }
-
-        private string GetRedisUrl()
-        {
-            var password64 = Configuration.GetValue<string>("REDIS_PASSWORD");
-            var password = password64; // Encoding.UTF8.GetString(Convert.FromBase64String(password64));
-            var redisHost = Configuration.GetValue<string>("REDIS_SERVICE_HOST");
-            var redisPort = Configuration.GetValue<string>("REDIS_SERVICE_PORT");
-            var rc = $"redis://{password}@{redisHost}:{redisPort}";
             return rc;
         }
 

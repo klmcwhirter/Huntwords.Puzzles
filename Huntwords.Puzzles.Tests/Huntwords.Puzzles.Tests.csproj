@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../hw-puzzles/hw-puzzles.csproj" />
+    <ProjectReference Include="../Huntwords.Puzzles/Huntwords.Puzzles.csproj" />
   </ItemGroup>
 
   <ItemGroup>

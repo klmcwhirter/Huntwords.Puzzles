@@ -1,11 +1,11 @@
 {
-  "name": "hw-puzzles",
+  "name": "Huntwords.Puzzles",
   "version": "2.0.0",
   "license": "MIT",
   "scripts": {
     "clean": "find . -type d \\( -name bin -o -name obj \\) -exec rm -fr {} \\;",
     "build": "dotnet build",
-    "test": "dotnet test hw-puzzles.Tests/hw-puzzles.Tests.csproj",
-    "start": "export ASPNETCORE_ENVIRONMENT=Development && export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -p hw-puzzles/hw-puzzles.csproj"
+    "test": "dotnet test Huntwords.Puzzles.Tests/Huntwords.Puzzles.Tests.csproj",
+    "start": "export ASPNETCORE_ENVIRONMENT=Development && export DOTNET_CLI_TELEMETRY_OPTOUT=1 && dotnet run -p Huntwords.Puzzles/Huntwords.Puzzles.csproj"
   }
 }

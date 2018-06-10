@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 
-namespace puzzles
+namespace Huntwords.Puzzles
 {
     public class Program
     {

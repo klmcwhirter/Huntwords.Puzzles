@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using hwpuzzles.Core.Models;
-using hwpuzzles.Core.Repositories;
+using Huntwords.Common.Models;
+using Huntwords.Common.Repositories;
 
-namespace puzzles.Controllers
+namespace Huntwords.Puzzles.Controllers
 {
     /// <summary>
     /// PuzzlesController

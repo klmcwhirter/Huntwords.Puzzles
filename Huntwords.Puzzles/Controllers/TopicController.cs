@@ -1,9 +1,9 @@
 #pragma warning disable CS1572, CS1573, CS1591
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using hwpuzzles.Core.Repositories;
+using Huntwords.Common.Repositories;
 
-namespace puzzles.Controllers
+namespace Huntwords.Puzzles.Controllers
 {
     /// <summary>
     /// TopicsController
