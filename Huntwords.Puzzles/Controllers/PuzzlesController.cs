@@ -107,7 +107,7 @@ namespace Huntwords.Puzzles.Controllers
         /// <param name="name">name of Puzzle definition into which to add word</param>
         /// <param name="word">Puzzle word</param>
         /// <returns>Puzzle modified</returns>
-        [HttpPut("{id}/words")]
+        [HttpPut("{name}/words")]
         public Puzzle AddWord(string name, [FromBody]string word)
         {
             var rc = PuzzleRepository.AddWord(name, word);
