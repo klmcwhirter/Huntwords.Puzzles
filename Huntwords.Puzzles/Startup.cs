@@ -80,6 +80,7 @@ namespace Huntwords.Puzzles
         {
             var builder = new ContainerBuilder();
 
+            builder.RegisterType<Huntwords.Puzzles.Controllers.RedisPuzzlesRepository>().As<Huntwords.Puzzles.Controllers.IPuzzlesRepository>();
             builder.RegisterCommonRedis(Configuration);
             builder.RegisterCommonRepositories();
             builder.RegisterCommonServices();
