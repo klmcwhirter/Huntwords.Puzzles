@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Huntwords.Common.Models;
+using Huntwords.Common.Repositories;
 
 namespace Huntwords.Puzzles.Controllers
 {
