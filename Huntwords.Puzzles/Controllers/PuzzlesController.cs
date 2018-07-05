@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Huntwords.Common.Models;
 using Huntwords.Common.Repositories;
+using Huntwords.Puzzles.Models;
 
 namespace Huntwords.Puzzles.Controllers
 {
@@ -108,9 +109,9 @@ namespace Huntwords.Puzzles.Controllers
         /// <param name="word">Puzzle word</param>
         /// <returns>Puzzle modified</returns>
         [HttpPut("{name}/words")]
-        public Puzzle AddWord(string name, [FromBody]string word)
+        public Puzzle AddWord(string name, [FromBody]PuzzleWord word)
         {
-            var rc = PuzzleRepository.AddWord(name, word);
+            var rc = PuzzleRepository.AddWord(name, word.Word);
             return rc;
         }
 
